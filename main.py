@@ -2,9 +2,11 @@ import os
 import threading
 import time
 import webbrowser
+import traceback
 
-import requests
-
+# =====================================================================
+# Kivy imports first — these MUST succeed for anything to render
+# =====================================================================
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
@@ -14,31 +16,67 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.uix.textinput import TextInput
 
-from eth_account import Account
-from eth_account.messages import encode_typed_data
-from eth_abi import encode as abi_encode
-from eth_utils import keccak
+# =====================================================================
+# Android logcat helper (works even if android libs are missing)
+# =====================================================================
+LOG_TAG = "SOSDEPLOYER"
+
+def _alog(msg):
+    try:
+        from jnius import autoclass
+        autoclass('android.util.Log').i(LOG_TAG, str(msg))
+    except Exception:
+        print("[{}] {}".format(LOG_TAG, msg))
+
+def _alog_err(msg):
+    try:
+        from jnius import autoclass
+        autoclass('android.util.Log').e(LOG_TAG, str(msg))
+    except Exception:
+        print("[{}][ERR] {}".format(LOG_TAG, msg))
+
 
 # =====================================================================
-# PASTE YOUR COMPILED SOS69069cSOS BYTECODE HERE
+# Heavy imports — wrapped so a failure shows on screen instead of
+# killing the process before Kivy starts.
+# =====================================================================
+_IMPORT_ERROR = None
+_IMPORT_OK = False
+
+try:
+    import requests
+    from eth_account import Account
+    from eth_account.messages import encode_typed_data
+    from eth_abi import encode as abi_encode
+    from eth_utils import keccak
+    _IMPORT_OK = True
+    _alog("Heavy imports OK (requests, eth_account, eth_abi, eth_utils)")
+except Exception:
+    _IMPORT_ERROR = traceback.format_exc()
+    _alog_err("HEAVY IMPORT FAILED:\n" + _IMPORT_ERROR)
+
+
+# =====================================================================
+# Constants (only computed if imports succeeded; otherwise placeholders)
 # =====================================================================
 CONTRACT_BYTECODE = "0x608060405234801561001057600080fd5b506040516100..."  # <-- REPLACE
 
-# =====================================================================
-# LEDGER constants (from SOS69069 source)
-# =====================================================================
 LEDGER_ADDR = "0x7373DBC24Dcd785896E8Ac3d5372c6ced9B75a8A"
 DOMAIN_NAME = "69069"
 DOMAIN_VERSION = "1"
-EIP712_DOMAIN_TYPEHASH = keccak(text=(
-    "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-))
-RECORD_TYPEHASH = keccak(text=(
-    "Record(address signer,address intendedTo,bytes32 payloadHash,bytes32 metadataHash)"
-))
 C_SOS_RESERVE = 10
-
 CONSTRUCTOR_TYPES = ["uint256", "address"]
+
+if _IMPORT_OK:
+    EIP712_DOMAIN_TYPEHASH = keccak(text=(
+        "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+    ))
+    RECORD_TYPEHASH = keccak(text=(
+        "Record(address signer,address intendedTo,bytes32 payloadHash,bytes32 metadataHash)"
+    ))
+else:
+    EIP712_DOMAIN_TYPEHASH = b""
+    RECORD_TYPEHASH = b""
 
 EXPLORER_HOSTS = {
     1: "etherscan.io", 5: "goerli.etherscan.io",
@@ -101,7 +139,6 @@ def decode_uint(h):
 
 
 def decode_int(h):
-    """Decode a signed int256 from a 32-byte hex result."""
     if not h or h == "0x":
         return 0
     n = int(h, 16)
@@ -160,7 +197,7 @@ def wait_for_receipt(rpc_url, tx_hash, timeout_s=360):
 
 
 # =====================================================================
-# EIP-712 hashing — exact match to SOS69069
+# EIP-712 hashing
 # =====================================================================
 def compute_metadata(amount: int) -> str:
     return f"cSOS:MINT:{amount}"
@@ -238,7 +275,6 @@ def check_ledger_present(rpc_url):
 
 
 def verify_struct_hash(rpc_url, user, payload, metadata) -> str:
-    """Returns LEDGER.recordStructHash() computed on-chain."""
     call_data = selector("recordStructHash(address,address,bytes32,string)") + abi_encode(
         ["address", "address", "bytes32", "string"],
         [user, user, bytes.fromhex(payload[2:]), metadata],
@@ -247,7 +283,6 @@ def verify_struct_hash(rpc_url, user, payload, metadata) -> str:
 
 
 def fetch_mint_status(rpc_url, csos_addr, user):
-    """Returns dict with effectiveOf, reserve, cap, minted, mintable."""
     eff = read_int(rpc_url, LEDGER_ADDR, "effectiveOf(address)", user)
     minted = read_uint(rpc_url, csos_addr, "minted(address)", user)
     mintable = read_uint(rpc_url, csos_addr, "mintable(address)", user)
@@ -518,7 +553,6 @@ class MintTab(BoxLayout):
                   self.contract, self.amount, self.payload, self.batch_n):
             self.add_widget(w)
 
-        # Row 1: previews
         r1 = BoxLayout(size_hint_y=0.075, spacing=6)
         b_prev      = Button(text="Preview", background_color=(0.4, 0.4, 0.7, 1))
         b_max_prev  = Button(text="MintMax Preview", background_color=(0.4, 0.5, 0.8, 1))
@@ -527,7 +561,6 @@ class MintTab(BoxLayout):
         r1.add_widget(b_prev); r1.add_widget(b_max_prev)
         self.add_widget(r1)
 
-        # Row 2: submits
         r2 = BoxLayout(size_hint_y=0.075, spacing=6)
         b_mint = Button(text="Sign & Mint")
         b_max  = Button(text="Sign & MintMax", background_color=(0.2, 0.7, 0.3, 1))
@@ -536,7 +569,6 @@ class MintTab(BoxLayout):
         r2.add_widget(b_mint); r2.add_widget(b_max)
         self.add_widget(r2)
 
-        # Row 3: batch check
         r3 = BoxLayout(size_hint_y=0.075, spacing=6)
         b_batch = Button(text="Batch Check", background_color=(0.5, 0.4, 0.7, 1))
         b_batch.bind(on_press=lambda *_: self._start("batch_check"))
@@ -588,7 +620,6 @@ class MintTab(BoxLayout):
                 daemon=True).start()
             return
 
-        # For mint-related modes, if amount blank we need it before starting
         if not amt_txt:
             self._log("→ Querying mintable(user) …")
             try:
@@ -609,9 +640,6 @@ class MintTab(BoxLayout):
             args=(rpc_url, chain_id, pk, csos, int(amt_txt), mode, payload),
             daemon=True).start()
 
-    # ------------------------------------------------------------------
-    # Mint / preview worker
-    # ------------------------------------------------------------------
     def _worker(self, rpc_url, chain_id, pk, csos, amount, mode, payload_input):
         try:
             acct = Account.from_key(pk)
@@ -619,7 +647,6 @@ class MintTab(BoxLayout):
             metadata = compute_metadata(amount)
             is_max_preview = (mode == "mintmax_preview")
 
-            # --- MintMax Preview: print the breakdown first ---
             if is_max_preview:
                 self._log("─── MintMax Preview ───")
                 try:
@@ -633,14 +660,12 @@ class MintTab(BoxLayout):
                         self._log("   ⚠️  mintable == 0 — mintMax would revert.")
                     else:
                         self._log(f"   → Sign & MintMax would mint {s['mintable']} cSOS")
-                        # Make sure our amount matches the on-chain value
                         amount = s["mintable"]
                         metadata = compute_metadata(amount)
                 except Exception as e:
                     self._log(f"   ⚠️  mint-status lookup failed: {e}")
                 self._log("─── Struct hash preview ───")
 
-            # --- payload hash ---
             if payload_input:
                 payload = payload_input if payload_input.startswith("0x") else "0x" + payload_input
                 if len(payload) != 66:
@@ -668,7 +693,6 @@ class MintTab(BoxLayout):
             except Exception as e:
                 self._log(f"   ⚠️  on-chain structHash call failed: {e}")
 
-            # --- pre-mint safety checks ---
             try:
                 used_ledger = read_bool(rpc_url, LEDGER_ADDR,
                                         "isRecordHashUsed(bytes32)", local_sh)
@@ -689,14 +713,12 @@ class MintTab(BoxLayout):
             except Exception as e:
                 self._log(f"   ⚠️  usedMintHash check failed: {e}")
 
-            # Preview modes stop here
             if mode in ("preview", "mintmax_preview"):
                 self._log("✅ Preview OK — tap Sign & Mint to submit.")
                 self._last_payload = payload
                 Clock.schedule_once(lambda *_: setattr(self.payload, "text", payload))
                 return
 
-            # --- sign ---
             self._log("→ Signing EIP-712 Record …")
             signature = sign_record(pk, chain_id, LEDGER_ADDR,
                                     user, user, payload, metadata)
@@ -721,9 +743,6 @@ class MintTab(BoxLayout):
         except Exception as e:
             self._log(f"❌ Failed:\n{e}")
 
-    # ------------------------------------------------------------------
-    # Batch check worker
-    # ------------------------------------------------------------------
     def _batch_worker(self, rpc_url, pk, csos, n):
         try:
             acct = Account.from_key(pk)
@@ -732,7 +751,6 @@ class MintTab(BoxLayout):
             self._log(f"   signer: {user}")
             self._log(f"   items:  {n}")
 
-            # Determine the metadata from the current amount field
             amt_txt = self.amount.text.strip()
             if not amt_txt:
                 try:
@@ -775,7 +793,6 @@ class MintTab(BoxLayout):
                 for p, h in fresh:
                     self._log(f"     payload = {p}")
                     self._log(f"     hash    = {h}")
-                # Stash the first fresh one for convenience
                 self._last_payload = fresh[0][0]
                 Clock.schedule_once(
                     lambda *_: setattr(self.payload, "text", fresh[0][0]))
@@ -889,18 +906,47 @@ class Root(TabbedPanel):
         self.default_tab = d
 
 
+# =====================================================================
+# Error screen shown only when heavy imports fail
+# =====================================================================
+class ImportErrorScreen(BoxLayout):
+    def __init__(self, err_text, **kw):
+        super().__init__(orientation="vertical", padding=12, spacing=8, **kw)
+        self.add_widget(Label(
+            text="Startup failed — missing or broken import",
+            size_hint_y=None, height=48, bold=True,
+            color=(1, 0.3, 0.3, 1),
+        ))
+        sv = ScrollView()
+        lbl = Label(text=err_text, size_hint_y=None, halign="left", valign="top",
+                    color=(1, 1, 1, 1))
+        lbl.bind(width=lambda *_: setattr(lbl, "text_size", (lbl.width, None)))
+        lbl.bind(texture_size=lambda *_: setattr(lbl, "height", lbl.texture_size[1]))
+        sv.add_widget(lbl)
+        self.add_widget(sv)
+
+
+# =====================================================================
+# App
+# =====================================================================
 class DeployerApp(App):
     last_deployed = None
     last_chain = None
     last_rpc = None
 
     def build(self):
+        _alog("DeployerApp.build() called")
+        if not _IMPORT_OK:
+            _alog_err("Returning error screen due to import failure")
+            return ImportErrorScreen(_IMPORT_ERROR or "Unknown import error")
+
         root = Root()
         for tab in root.tab_list:
             if tab.text == "Mint":
                 self.mint_tab = tab.content
                 break
         self.root_widget = root
+        _alog("UI built OK")
         return root
 
     def switch_to_tab(self, content_widget):
@@ -911,4 +957,10 @@ class DeployerApp(App):
 
 
 if __name__ == "__main__":
-    DeployerApp().run()
+    try:
+        _alog("Entering DeployerApp().run()")
+        DeployerApp().run()
+        _alog("App.run() returned cleanly")
+    except Exception:
+        _alog_err("TOP-LEVEL CRASH:\n" + traceback.format_exc())
+        raise
