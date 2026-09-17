@@ -44,13 +44,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.buildozer
-          key: buildozer-global-java17-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+          key: buildozer-global-py311v3-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
 
       - name: Cache buildozer project dir
         uses: actions/cache@v4
         with:
           path: .buildozer
-          key: buildozer-project-java17-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+          key: buildozer-project-py311v3-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
 
       - name: Build debug APK (verbose, captured to file)
         run: |
