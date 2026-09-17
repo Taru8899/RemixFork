@@ -23,12 +23,19 @@ jobs:
             git zip unzip openjdk-17-jdk \
             autoconf libtool pkg-config \
             zlib1g-dev libncurses5-dev libncursesw5-dev \
-            libtinfo5 cmake libffi-dev libssl-dev
+            cmake libffi-dev libssl-dev
 
       - name: Install buildozer + Cython
         run: |
           pip install --upgrade pip
           pip install buildozer cython==0.29.36 virtualenv
+
+      - name: Pre-download Android SDK / NDK (cached)
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME"
+          ls "$ANDROID_HOME" || true
+          ls "$ANDROID_NDK_HOME" || true
 
       - name: Cache buildozer global dir
         uses: actions/cache@v4
@@ -42,11 +49,27 @@ jobs:
           path: .buildozer
           key: buildozer-project-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
 
-      - name: Build debug APK
+      - name: Build debug APK (verbose, captured to file)
         run: |
-          yes | buildozer -v android debug
+          set -o pipefail
+          yes | buildozer -v android debug 2>&1 | tee buildozer.log
+
+      - name: Show tail of buildozer log on failure
+        if: failure()
+        run: |
+          echo "=== last 200 lines of buildozer.log ==="
+          tail -n 200 buildozer.log
+
+      - name: Upload buildozer log (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: buildozer-log
+          path: buildozer.log
+          if-no-files-found: warn
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: sos-deployer-apk
