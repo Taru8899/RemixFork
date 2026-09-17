@@ -55,7 +55,7 @@ jobs:
       - name: Build debug APK (verbose, captured to file)
         run: |
           set -o pipefail
-          yes | buildozer -v android debug 2>&1 | tee buildozer.log
+          (yes || true) | buildozer -v android debug 2>&1 | tee buildozer.log
 
       - name: Show tail of buildozer log on failure
         if: failure()
