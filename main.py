@@ -129,6 +129,8 @@ def _make_cytoolz_stub():
             data = f(data)
         return data
 
+    partial = functools.partial
+
     def keymap(func, d):
         return {func(k): v for k, v in d.items()}
 
