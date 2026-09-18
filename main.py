@@ -37,19 +37,15 @@ def _alog_err(msg):
 
 
 # =====================================================================
-# DIAGNOSTIC — log the real runtime state before we touch anything
-# that depends on it. Remove this block once the mystery is solved.
+# Fix CFFI / pycryptodome crash on Android (PYTHONOPTIMIZE=2)
+# Must run BEFORE any Crypto / eth_account / eth_keyfile import
 # =====================================================================
+import ctypes
+import sys
 try:
-    import sys
-    _alog("DIAG sys.flags.optimize = {}".format(sys.flags.optimize))
-    _alog("DIAG PYTHONOPTIMIZE env = {}".format(os.environ.get("PYTHONOPTIMIZE")))
-    _relevant_env = {k: v for k, v in os.environ.items() if "PYTHON" in k or "P4A" in k or "ANDROID" in k}
-    for _k, _v in sorted(_relevant_env.items()):
-        _alog("DIAG env {} = {}".format(_k, _v))
+    ctypes.pythonapi = ctypes.PyDLL("libpython%d.%d.so" % sys.version_info[:2])
 except Exception:
-    _alog_err("DIAG block itself failed:\n" + traceback.format_exc())
-
+    pass
 
 # =====================================================================
 # Heavy imports — wrapped so a failure shows on screen instead of
