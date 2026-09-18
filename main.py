@@ -5,6 +5,7 @@ import webbrowser
 import traceback
 import sys
 import types
+import functools
 
 # =====================================================================
 # Kivy imports first — these MUST succeed for anything to render
@@ -39,7 +40,7 @@ def _alog_err(msg):
 
 
 # =====================================================================
-# Pure-Python cytoolz stub (avoids compiled .so architecture problems)
+# Pure-Python cytoolz stub (complete enough for eth-account 0.10.0)
 # Injected into sys.modules BEFORE eth_account is imported
 # =====================================================================
 def _make_cytoolz_stub():
@@ -68,16 +69,100 @@ def _make_cytoolz_stub():
                 return default
         return coll
 
-    mod.dissoc = dissoc
-    mod.assoc = assoc
-    mod.merge = merge
-    mod.get_in = get_in
-    mod.identity = lambda x: x
+    def curry(func):
+        """Minimal curry implementation sufficient for eth-account."""
+        @functools.wraps(func)
+        def curried(*args, **kwargs):
+            try:
+                needed = func.__code__.co_argcount
+            except Exception:
+                needed = 1
+            if len(args) + len(kwargs) >= needed:
+                return func(*args, **kwargs)
+            return functools.partial(curried, *args, **kwargs)
+        return curried
+
+    def compose(*funcs):
+        def composed(*args, **kwargs):
+            for f in reversed(funcs):
+                args = (f(*args, **kwargs),)
+                kwargs = {}
+            return args[0] if args else None
+        return composed
+
+    def identity(x):
+        return x
+
+    def first(seq):
+        return next(iter(seq))
+
+    def second(seq):
+        it = iter(seq)
+        next(it)
+        return next(it)
+
+    def last(seq):
+        item = None
+        for item in seq:
+            pass
+        return item
+
+    def take(n, seq):
+        return list(seq)[:n]
+
+    def drop(n, seq):
+        it = iter(seq)
+        for _ in range(n):
+            next(it, None)
+        return list(it)
+
+    def concat(seqs):
+        for seq in seqs:
+            for item in seq:
+                yield item
+
+    def mapcat(func, seqs):
+        return concat(map(func, seqs))
+
+    def pipe(data, *funcs):
+        for f in funcs:
+            data = f(data)
+        return data
+
+    def keymap(func, d):
+        return {func(k): v for k, v in d.items()}
+
+    def valmap(func, d):
+        return {k: func(v) for k, v in d.items()}
+
+    def itemmap(func, d):
+        return dict(func(k, v) for k, v in d.items())
+
+    def keyfilter(pred, d):
+        return {k: v for k, v in d.items() if pred(k)}
+
+    def valfilter(pred, d):
+        return {k: v for k, v in d.items() if pred(v)}
+
+    def itemfilter(pred, d):
+        return {k: v for k, v in d.items() if pred((k, v))}
+
+    # Expose everything eth-account is likely to need
+    for name, obj in list(locals().items()):
+        if not name.startswith("_") and name != "mod":
+            setattr(mod, name, obj)
+
+    mod.functoolz = mod
+    mod.dicttoolz = mod
+    mod.itertoolz = mod
     return mod
 
-# Install the stub so "import cytoolz" succeeds
-sys.modules["cytoolz"] = _make_cytoolz_stub()
-sys.modules["cytoolz.dicttoolz"] = sys.modules["cytoolz"]
+# Install the stub so "import cytoolz" and "from cytoolz import curry" succeed
+_cytoolz = _make_cytoolz_stub()
+sys.modules["cytoolz"] = _cytoolz
+sys.modules["cytoolz.dicttoolz"] = _cytoolz
+sys.modules["cytoolz.functoolz"] = _cytoolz
+sys.modules["cytoolz.itertoolz"] = _cytoolz
 
 
 # =====================================================================
