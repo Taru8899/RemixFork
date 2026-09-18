@@ -3,6 +3,8 @@ import threading
 import time
 import webbrowser
 import traceback
+import sys
+import types
 
 # =====================================================================
 # Kivy imports first — these MUST succeed for anything to render
@@ -37,15 +39,57 @@ def _alog_err(msg):
 
 
 # =====================================================================
+# Pure-Python cytoolz stub (avoids compiled .so architecture problems)
+# Injected into sys.modules BEFORE eth_account is imported
+# =====================================================================
+def _make_cytoolz_stub():
+    mod = types.ModuleType("cytoolz")
+
+    def dissoc(d, *keys):
+        return {k: v for k, v in d.items() if k not in keys}
+
+    def assoc(d, key, value):
+        result = dict(d)
+        result[key] = value
+        return result
+
+    def merge(*dicts):
+        result = {}
+        for d in dicts:
+            if d:
+                result.update(d)
+        return result
+
+    def get_in(keys, coll, default=None):
+        for key in keys:
+            try:
+                coll = coll[key]
+            except (KeyError, TypeError, IndexError):
+                return default
+        return coll
+
+    mod.dissoc = dissoc
+    mod.assoc = assoc
+    mod.merge = merge
+    mod.get_in = get_in
+    mod.identity = lambda x: x
+    return mod
+
+# Install the stub so "import cytoolz" succeeds
+sys.modules["cytoolz"] = _make_cytoolz_stub()
+sys.modules["cytoolz.dicttoolz"] = sys.modules["cytoolz"]
+
+
+# =====================================================================
 # Fix CFFI / pycryptodome crash on Android (PYTHONOPTIMIZE=2)
 # Must run BEFORE any Crypto / eth_account / eth_keyfile import
 # =====================================================================
 import ctypes
-import sys
 try:
     ctypes.pythonapi = ctypes.PyDLL("libpython%d.%d.so" % sys.version_info[:2])
 except Exception:
     pass
+
 
 # =====================================================================
 # Heavy imports — wrapped so a failure shows on screen instead of
