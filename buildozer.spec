@@ -18,5 +18,8 @@ android.archs = arm64-v8a
 android.accept_sdk_license = True
 android.allow_backup = True
 
+p4a.fork = YOUR_GITHUB_USERNAME
+p4a.branch = fix-pythonoptimize
+
 [buildozer]
 log_level = 2
