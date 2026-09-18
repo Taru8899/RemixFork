@@ -37,6 +37,21 @@ def _alog_err(msg):
 
 
 # =====================================================================
+# DIAGNOSTIC — log the real runtime state before we touch anything
+# that depends on it. Remove this block once the mystery is solved.
+# =====================================================================
+try:
+    import sys
+    _alog("DIAG sys.flags.optimize = {}".format(sys.flags.optimize))
+    _alog("DIAG PYTHONOPTIMIZE env = {}".format(os.environ.get("PYTHONOPTIMIZE")))
+    _relevant_env = {k: v for k, v in os.environ.items() if "PYTHON" in k or "P4A" in k or "ANDROID" in k}
+    for _k, _v in sorted(_relevant_env.items()):
+        _alog("DIAG env {} = {}".format(_k, _v))
+except Exception:
+    _alog_err("DIAG block itself failed:\n" + traceback.format_exc())
+
+
+# =====================================================================
 # Heavy imports — wrapped so a failure shows on screen instead of
 # killing the process before Kivy starts.
 # =====================================================================
