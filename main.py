@@ -28,6 +28,36 @@ from kivy.uix.textinput import TextInput
 LOG_TAG = "SOSDEPLOYER"
 APP_VERSION = "0.3"
 
+# Early theme constants (must exist before make_button/make_input run)
+try:
+    from kivy.utils import get_color_from_hex as _gch
+except Exception:
+    def _gch(h):
+        h = h.lstrip("#")
+        return tuple(int(h[i:i+2], 16) / 255.0 for i in (0, 2, 4)) + (1.0,)
+
+BG          = _gch("#0a0e0b")
+CARD_BG     = _gch("#141b16")
+INPUT_BG    = _gch("#232f27")
+BORDER      = _gch("#2c3830")
+TEXT        = _gch("#ffffff")
+TEXT_SEC    = _gch("#bbbbbb")
+TEXT_MUTED  = _gch("#9ca3af")
+GREEN       = _gch("#04aa34")
+GREEN_BR    = _gch("#22c55e")
+BLUE        = _gch("#0038fe")
+BLUE_SOFT   = _gch("#5b8bff")
+YELLOW      = _gch("#facc15")
+ORANGE      = _gch("#f97316")
+DANGER      = _gch("#ef4444")
+GRAY        = INPUT_BG
+WHITE       = TEXT
+try:
+    Window.clearcolor = BG
+except Exception:
+    pass
+
+
 def _alog(msg):
     try:
         from jnius import autoclass
@@ -600,7 +630,7 @@ def make_button(label, bg=None, height=64):
 
 
 def make_input(hint, password=False, numeric=False, height=0.055, text=""):
-    # Field must be clearly larger than the text line (comfortable mobile UX)
+    # Field taller than text; do NOT pass bold= (TextInput has no bold property → crash)
     h = 68
     return TextInput(
         hint_text=hint, password=password, multiline=False,
@@ -613,10 +643,8 @@ def make_input(hint, password=False, numeric=False, height=0.055, text=""):
         background_color=INPUT_BG,
         foreground_color=TEXT,
         cursor_color=BLUE_SOFT,
-        # generous padding so text sits centered and never clips
         padding=[18, 20, 18, 20],
         font_size="18sp",
-        bold=True,
         write_tab=False,
         hint_text_color=TEXT_MUTED,
         halign="left",
@@ -1153,12 +1181,11 @@ class Root(BoxLayout):
             do_default_tab=False,
             tab_width=140,
             tab_height=60,
-            background_color=BG,
-            border=[0, 0, 0, 0],
             size_hint=(1, 1),
         )
-        # dark strip
         try:
+            tabs.background_color = BG
+            tabs.border = [0, 0, 0, 0]
             tabs.background_image = ""
         except Exception:
             pass
@@ -1216,14 +1243,19 @@ class DeployerApp(App):
             _alog_err("Returning error screen due to import failure")
             return ImportErrorScreen(_IMPORT_ERROR or "Unknown import error")
 
-        root = Root()
-        for tab in root.tab_list:
-            if tab.text == "Mint":
-                self.mint_tab = tab.content
-                break
-        self.root_widget = root
-        _alog("UI built OK")
-        return root
+        try:
+            root = Root()
+            for tab in root.tab_list:
+                if tab.text == "Mint":
+                    self.mint_tab = tab.content
+                    break
+            self.root_widget = root
+            _alog("UI built OK")
+            return root
+        except Exception:
+            err = traceback.format_exc()
+            _alog_err("UI build crashed:\n" + err)
+            return ImportErrorScreen(err)
 
     def switch_to_tab(self, content_widget):
         tabs = getattr(self.root_widget, "tabs", self.root_widget)
