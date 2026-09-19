@@ -25,7 +25,7 @@ from kivy.uix.textinput import TextInput
 # =====================================================================
 # Android logcat helper (works even if android libs are missing)
 # =====================================================================
-LOG_TAG = "SOSDEPLOYER"
+LOG_TAG = "SOS69069CSOS"
 APP_VERSION = "0.4"
 
 # Early theme constants (must exist before make_button/make_input run)
@@ -745,7 +745,7 @@ except Exception:
     pass
 
 
-def make_header(title_text="SOS Deployer"):
+def make_header(title_text="SOS 69069 cSOS"):
     """Logo top-left + title only (NO version here — version is splash-only)."""
     from kivy.uix.image import Image
     row = BoxLayout(orientation="horizontal", size_hint_y=None, height=dp(64),
@@ -1262,7 +1262,7 @@ class Root(BoxLayout):
         self.spacing = 0
 
         # Global header: logo top-left + title (no version)
-        self.add_widget(make_header("SOS Deployer"))
+        self.add_widget(make_header("SOS 69069 cSOS"))
 
         tabs = TabbedPanel(
             do_default_tab=False,
@@ -1277,19 +1277,19 @@ class Root(BoxLayout):
         except Exception:
             pass
 
-        d = TabbedPanelItem(text="Deploy")
-        d.add_widget(DeployTab())
-        tabs.add_widget(d)
+        q = TabbedPanelItem(text="Query")
+        q.add_widget(QueryTab())
+        tabs.add_widget(q)
 
         m = TabbedPanelItem(text="Mint")
         m.add_widget(MintTab())
         tabs.add_widget(m)
 
-        q = TabbedPanelItem(text="Query")
-        q.add_widget(QueryTab())
-        tabs.add_widget(q)
+        d = TabbedPanelItem(text="Deploy")
+        d.add_widget(DeployTab())
+        tabs.add_widget(d)
 
-        tabs.default_tab = d
+        tabs.default_tab = q
         self.tabs = tabs
         self.add_widget(tabs)
         self.tab_list = tabs.tab_list
@@ -1319,7 +1319,7 @@ class ImportErrorScreen(BoxLayout):
 # App
 # =====================================================================
 class DeployerApp(App):
-    title = f"SOS Deployer v{APP_VERSION}"
+    title = f"SOS 69069 cSOS v{APP_VERSION}"
     last_deployed = None
     last_chain = None
     last_rpc = None

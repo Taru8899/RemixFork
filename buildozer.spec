@@ -1,11 +1,11 @@
 [app]
-title = SOS Deployer
-package.name = sosdeployer
+title = SOS 69069 cSOS
+package.name = sos69069csos
 package.domain = org.sos
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 source.include_patterns = assets/*,icon.png,presplash.png
-version = 0.3
+version = 0.4
 
 icon.filename = %(source.dir)s/icon.png
 presplash.filename = %(source.dir)s/presplash.png
