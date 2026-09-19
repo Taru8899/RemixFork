@@ -583,22 +583,42 @@ def submit_mint(rpc_url, chain_id, private_key, csos_addr, amount,
 # =====================================================================
 # UI helpers
 # =====================================================================
+def make_button(label, bg=None, height=52):
+    """Full-width action button — large touch target."""
+    btn = Button(
+        text=label,
+        size_hint_y=None,
+        height=height,
+        background_normal="",
+        background_down="",
+        background_color=bg if bg is not None else GREEN,
+        color=TEXT,
+        bold=True,
+        font_size="16sp",
+    )
+    return btn
+
+
 def make_input(hint, password=False, numeric=False, height=0.055, text=""):
+    # Fixed tall fields; vertical padding centers single-line text in the box
+    h = 56
     return TextInput(
         hint_text=hint, password=password, multiline=False,
         input_filter="int" if numeric else None,
         size_hint_y=None,
-        height=46,
+        height=h,
         text=text,
         background_normal="",
         background_active="",
         background_color=INPUT_BG,
         foreground_color=TEXT,
         cursor_color=BLUE_SOFT,
-        padding=[12, 12],
-        font_size="14sp",
+        # left/right 14; top/bottom ~ (h - line) / 2 for visual vertical center
+        padding=[14, 16, 14, 16],
+        font_size="16sp",
         write_tab=False,
         hint_text_color=TEXT_MUTED,
+        halign="left",
     )
 
 
@@ -648,7 +668,7 @@ except Exception:
 def make_header(title_text="SOS Deployer"):
     """Logo top-left + title only (NO version here — version is splash-only)."""
     from kivy.uix.image import Image
-    row = BoxLayout(orientation="horizontal", size_hint_y=None, height=dp(52),
+    row = BoxLayout(orientation="horizontal", size_hint_y=None, height=dp(56),
                     spacing=dp(10), padding=[dp(12), dp(8), dp(8), dp(4)])
     try:
         logo = Image(source="assets/logo.png", size_hint=(None, None),
@@ -679,9 +699,9 @@ def make_unique_payload(user: str, amount: int) -> str:
 
 def status_label(text=""):
     return Label(
-        text=text, size_hint_y=None, height=28,
+        text=text, size_hint_y=None, height=36,
         color=GREEN_BR, bold=True, halign="left", valign="middle",
-        font_size="14sp",
+        font_size="15sp",
     )
 
 
@@ -704,24 +724,22 @@ class DeployTab(BoxLayout):
         for w in (self.pk, self.rpc_url, self.chain_id, self.mint_fee, self.treasury):
             self.add_widget(w)
 
-        row = BoxLayout(size_hint_y=0.07, spacing=6)
-        self.deploy_btn = Button(text="Deploy Contract", background_color=GREEN, color=TEXT)
-        self.check_ledger_btn = Button(text="Check LEDGER", background_color=INPUT_BG, color=TEXT)
+        row = BoxLayout(size_hint_y=None, height=56, spacing=8)
+        self.deploy_btn = make_button("Deploy Contract", GREEN)
+        self.check_ledger_btn = make_button("Check LEDGER", INPUT_BG)
         self.deploy_btn.bind(on_press=self.on_deploy)
         self.check_ledger_btn.bind(on_press=self.on_check_ledger)
         row.add_widget(self.deploy_btn)
         row.add_widget(self.check_ledger_btn)
         self.add_widget(row)
 
-        self.etherscan_btn = Button(
-            text="Open on Etherscan (verify source)", size_hint_y=0.07,
-            background_color=BLUE, color=TEXT, disabled=True)
+        self.etherscan_btn = make_button("Open on Etherscan (verify source)", BLUE)
+        self.etherscan_btn.disabled = True
         self.etherscan_btn.bind(on_press=self._on_etherscan)
         self.add_widget(self.etherscan_btn)
 
-        self.mint_tab_btn = Button(
-            text="→ Go to Mint tab (prefilled)", size_hint_y=0.07,
-            background_color=GREEN, disabled=True)
+        self.mint_tab_btn = make_button("→ Go to Mint tab (prefilled)", GREEN)
+        self.mint_tab_btn.disabled = True
         self.mint_tab_btn.bind(on_press=self._on_goto_mint)
         self.add_widget(self.mint_tab_btn)
 
@@ -876,14 +894,14 @@ class MintTab(BoxLayout):
         self.add_widget(self.payload)
 
         # Buttons
-        row1 = BoxLayout(size_hint_y=0.07, spacing=6)
-        b_refresh = Button(text="Refresh Status", background_color=INPUT_BG, color=TEXT)
+        row1 = BoxLayout(size_hint_y=None, height=56, spacing=8)
+        b_refresh = make_button("Refresh Status", INPUT_BG)
         b_refresh.bind(on_press=lambda *_: self._start("status"))
         row1.add_widget(b_refresh)
         self.add_widget(row1)
 
-        row2 = BoxLayout(size_hint_y=0.08, spacing=6)
-        self.mint_btn = Button(text="Sign & Mint", background_color=GREEN, color=TEXT)
+        row2 = BoxLayout(size_hint_y=None, height=56, spacing=8)
+        self.mint_btn = make_button("Sign & Mint", GREEN, height=56)
         self.mint_btn.bind(on_press=lambda *_: self._start("mint"))
         row2.add_widget(self.mint_btn)
         self.add_widget(row2)
@@ -1072,8 +1090,8 @@ class QueryTab(BoxLayout):
         for w in (self.rpc_url, self.address, self.csos):
             self.add_widget(w)
 
-        row = BoxLayout(size_hint_y=0.07, spacing=6)
-        b = Button(text="Query", background_color=GREEN, color=TEXT)
+        row = BoxLayout(size_hint_y=None, height=56, spacing=8)
+        b = make_button("Query", GREEN)
         b.bind(on_press=self.on_query)
         row.add_widget(b)
         self.add_widget(row)
@@ -1132,8 +1150,8 @@ class Root(BoxLayout):
 
         tabs = TabbedPanel(
             do_default_tab=False,
-            tab_width=120,
-            tab_height=44,
+            tab_width=130,
+            tab_height=52,
             background_color=BG,
             border=[0, 0, 0, 0],
             size_hint=(1, 1),
