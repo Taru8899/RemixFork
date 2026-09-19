@@ -201,7 +201,7 @@ except Exception:
 # =====================================================================
 # Constants (only computed if imports succeeded; otherwise placeholders)
 # =====================================================================
-CONTRACT_BYTECODE = "0x608060405234801561001057600080fd5b506040516100..."  # <-- REPLACE
+CONTRACT_BYTECODE = "0x6080604052600436106101fb575f3560e01c8063739e2e091161010c578063a457c2d71161009f578063d113b95c1161006e578063d113b95c146107f5578063d7bf81a31461080b578063dd62ed3e14610835578063fed3fdcb14610871578063fed976f71461089b57610232565b8063a457c2d71461073d578063a6cd4c6914610779578063a9059cbb146107a3578063cfc98a24146107df57610232565b806395d89b41116100db57806395d89b41146106a35780639ab475b5146106cd5780639d2cc436146106e95780639fbaf3de1461071357610232565b8063739e2e09146105d757806377b5255614610601578063862e2fc81461063d57806392a49e211461066757610232565b8063313ce5671161018f5780634b6604191161015e5780634b660419146104c857806359441eae146104f257806364e4d3a41461052e5780636fab912a1461055e57806370a082311461059b57610232565b8063313ce567146103fc57806339509351146104265780633c3a44da1461046257806342fcfe391461048c57610232565b80631e7269c5116101cb5780631e7269c51461033057806323b872dd1461036c57806324031a05146103a85780632d2c5565146103d257610232565b80625dfcbf1461026457806306fdde03146102a0578063095ea7b3146102ca57806318160ddd1461030657610232565b36610232576040517f60f8f32100000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6040517f60f8f32100000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b34801561026f575f5ffd5b5061028a60048036038101906102859190612302565b6108c5565b6040516102979190612345565b60405180910390f35b3480156102ab575f5ffd5b506102b46108da565b6040516102c191906123ce565b60405180910390f35b3480156102d5575f5ffd5b506102f060048036038101906102eb9190612418565b610913565b6040516102fd9190612470565b60405180910390f35b348015610311575f5ffd5b5061031a610a00565b6040516103279190612345565b60405180910390f35b34801561033b575f5ffd5b5061035660048036038101906103519190612302565b610a06565b6040516103639190612345565b60405180910390f35b348015610377575f5ffd5b50610392600480360381019061038d9190612489565b610a1b565b60405161039f9190612470565b60405180910390f35b3480156103b3575f5ffd5b506103bc610d75565b6040516103c991906124e8565b60405180910390f35b3480156103dd575f5ffd5b506103e6610d8d565b6040516103f391906124e8565b60405180910390f35b348015610407575f5ffd5b50610410610db1565b60405161041d919061251c565b60405180910390f35b348015610431575f5ffd5b5061044c60048036038101906104479190612418565b610db5565b6040516104599190612470565b60405180910390f35b34801561046d575f5ffd5b50610476610f2a565b6040516104839190612345565b60405180910390f35b348015610497575f5ffd5b506104b260048036038101906104ad9190612535565b610f30565b6040516104bf91906123ce565b60405180910390f35b3480156104d3575f5ffd5b506104dc610f98565b6040516104e991906125bb565b60405180910390f35b3480156104fd575f5ffd5b5061051860048036038101906105139190612302565b610fb0565b6040516105259190612345565b60405180910390f35b61054860048036038101906105439190612668565b6110cb565b6040516105559190612345565b60405180910390f35b348015610569575f5ffd5b50610584600480360381019061057f91906126c5565b61116f565b604051610592929190612724565b60405180910390f35b3480156105a6575f5ffd5b506105c160048036038101906105bc9190612302565b611219565b6040516105ce9190612345565b60405180910390f35b3480156105e2575f5ffd5b506105eb61122e565b6040516105f89190612345565b60405180910390f35b34801561060c575f5ffd5b5061062760048036038101906106229190612752565b611233565b6040516106349190612470565b60405180910390f35b348015610648575f5ffd5b50610651611250565b60405161065e9190612345565b60405180910390f35b348015610672575f5ffd5b5061068d600480360381019061068891906126c5565b611256565b60405161069a919061277d565b60405180910390f35b3480156106ae575f5ffd5b506106b76112fa565b6040516106c491906123ce565b60405180910390f35b6106e760048036038101906106e29190612796565b611333565b005b3480156106f4575f5ffd5b506106fd6113ca565b60405161070a9190612345565b60405180910390f35b34801561071e575f5ffd5b506107276113cf565b6040516107349190612345565b60405180910390f35b348015610748575f5ffd5b50610763600480360381019061075e9190612418565b6113d5565b6040516107709190612470565b60405180910390f35b348015610784575f5ffd5b5061078d611589565b60405161079a91906123ce565b60405180910390f35b3480156107ae575f5ffd5b506107c960048036038101906107c49190612418565b6115c2565b6040516107d69190612470565b60405180910390f35b3480156107ea575f5ffd5b506107f36117b4565b005b348015610800575f5ffd5b50610809611920565b005b348015610816575f5ffd5b5061081f611a96565b60405161082c9190612345565b60405180910390f35b348015610840575f5ffd5b5061085b60048036038101906108569190612807565b611aba565b6040516108689190612345565b60405180910390f35b34801561087c575f5ffd5b50610885611ada565b6040516108929190612345565b60405180910390f35b3480156108a6575f5ffd5b506108af611ae1565b6040516108bc9190612345565b60405180910390f35b6007602052805f5260405f205f915090505481565b6040518060400160405280600d81526020017f534f5336393036392063534f530000000000000000000000000000000000000081525081565b5f8160085f3373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f8573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f20819055508273ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff167f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925846040516109ee9190612345565b60405180910390a36001905092915050565b60045481565b6006602052805f5260405f205f915090505481565b5f5f73ffffffffffffffffffffffffffffffffffffffff168373ffffffffffffffffffffffffffffffffffffffff1603610a81576040517fd92e233d00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8160055f8673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f20541015610af8576040517ff4d678b800000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f60085f8673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f3373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f2054905082811015610bae576040517f13be252b00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8114610c5e578281610be19190612872565b60085f8773ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f3373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f20819055505b8260055f8773ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f828254610caa9190612872565b925050819055508260055f8673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f828254610cfd91906128a5565b925050819055508373ffffffffffffffffffffffffffffffffffffffff168573ffffffffffffffffffffffffffffffffffffffff167fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef85604051610d619190612345565b60405180910390a360019150509392505050565b731c10e6574ee696f54b21a611a21313e4714628ad81565b7f0000000000000000000000001c10e6574ee696f54b21a611a21313e4714628ad81565b5f81565b5f5f8260085f3373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f8673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f2054610e3b91906128a5565b90508060085f3373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f8673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f20819055508373ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff167f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b92583604051610f179190612345565b60405180910390a3600191505092915050565b60015481565b60606040518060400160405280600a81526020017f63534f533a4d494e543a00000000000000000000000000000000000000000000815250610f7183611af6565b604051602001610f82929190612912565b6040516020818303038152906040529050919050565b737373dbc24dcd785896e8ac3d5372c6ced9b75a8a81565b5f5f737373dbc24dcd785896e8ac3d5372c6ced9b75a8a73ffffffffffffffffffffffffffffffffffffffff166378be73fc846040518263ffffffff1660e01b8152600401610fff91906124e8565b602060405180830381865afa15801561101a573d5f5f3e3d5ffd5b505050506040513d601f19601f8201168201806040525081019061103e9190612968565b9050600a8113611051575f9150506110c6565b5f600a8261105f9190612872565b90505f60065f8673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205490508181106110b4575f93505050506110c6565b80826110c09190612872565b93505050505b919050565b5f6002600a5403611108576040517fab143c0600000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6002600a8190555061111933610fb0565b90505f8103611154576040517f017f629a00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b61116081858585611c4f565b6001600a819055509392505050565b60605f61117b84610f30565b9150737373dbc24dcd785896e8ac3d5372c6ced9b75a8a73ffffffffffffffffffffffffffffffffffffffff1663cd6f7d9b868786866040518563ffffffff1660e01b81526004016111d09493929190612993565b602060405180830381865afa1580156111eb573d5f5f3e3d5ffd5b505050506040513d601f19601f8201168201806040525081019061120f91906129f1565b9050935093915050565b6005602052805f5260405f205f915090505481565b5f5481565b6009602052805f5260405f205f915054906101000a900460ff1681565b60025481565b5f737373dbc24dcd785896e8ac3d5372c6ced9b75a8a73ffffffffffffffffffffffffffffffffffffffff1663cd6f7d9b85868561129388610f30565b6040518563ffffffff1660e01b81526004016112b29493929190612993565b602060405180830381865afa1580156112cd573d5f5f3e3d5ffd5b505050506040513d601f19601f820116820180604052508101906112f191906129f1565b90509392505050565b6040518060400160405280600481526020017f63534f530000000000000000000000000000000000000000000000000000000081525081565b6002600a540361136f576040517fab143c0600000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6002600a819055505f84036113b0576040517f017f629a00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6113bc84848484611c4f565b6001600a8190555050505050565b600a81565b60035481565b5f5f60085f3373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f8573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205490508281101561148c576040517f13be252b00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f83826114999190612872565b90508060085f3373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f8773ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f20819055508473ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff167f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925836040516115759190612345565b60405180910390a360019250505092915050565b6040518060400160405280600a81526020017f63534f533a4d494e543a0000000000000000000000000000000000000000000081525081565b5f5f73ffffffffffffffffffffffffffffffffffffffff168373ffffffffffffffffffffffffffffffffffffffff1603611628576040517fd92e233d00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8160055f3373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f2054101561169f576040517ff4d678b800000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8160055f3373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f8282546116eb9190612872565b925050819055508160055f8573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f82825461173e91906128a5565b925050819055508273ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff167fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef846040516117a29190612345565b60405180910390a36001905092915050565b6002600a54036117f0576040517fab143c0600000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6002600a819055505f60015490505f810361180b5750611916565b5f6001819055505f731c10e6574ee696f54b21a611a21313e4714628ad73ffffffffffffffffffffffffffffffffffffffff168260405161184b90612a49565b5f6040518083038185875af1925050503d805f8114611885576040519150601f19603f3d011682016040523d82523d5f602084013e61188a565b606091505b50509050806118c5576040517fd41997a500000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b3373ffffffffffffffffffffffffffffffffffffffff167fcb2e84b08a7a96bf62a4416748a26a53aeb0f87dd26e2ef25bc46df567411b348360405161190b9190612345565b60405180910390a250505b6001600a81905550565b6002600a540361195c576040517fab143c0600000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6002600a819055505f5f5490505f81036119765750611a8c565b5f5f819055505f7f0000000000000000000000001c10e6574ee696f54b21a611a21313e4714628ad73ffffffffffffffffffffffffffffffffffffffff16826040516119c190612a49565b5f6040518083038185875af1925050503d805f81146119fb576040519150601f19603f3d011682016040523d82523d5f602084013e611a00565b606091505b5050905080611a3b576040517f0e373cf800000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b3373ffffffffffffffffffffffffffffffffffffffff167fb6c81b526e1bd55a3845d8caa6fe0c1ce87b3c9e534eec43f43b3c1849d4e2e883604051611a819190612345565b60405180910390a250505b6001600a81905550565b7f000000000000000000000000000000000000000000000000000000000000000081565b6008602052815f5260405f20602052805f5260405f205f91509150505481565b6201388081565b5f3a62013880611af19190612a5d565b905090565b60605f8203611b3c576040518060400160405280600181526020017f30000000000000000000000000000000000000000000000000000000000000008152509050611c4a565b5f8290505f5b5f8214611b6b578080611b5490612a9e565b915050600a82611b649190612b12565b9150611b42565b5f8167ffffffffffffffff811115611b8657611b85612b42565b5b6040519080825280601f01601f191660200182016040528015611bb85781602001600182028036833780820191505090505b5090505b5f8514611c4357600182611bd09190612872565b9150600a85611bdf9190612b6f565b6030611beb91906128a5565b60f81b818381518110611c0157611c00612b9f565b5b60200101907effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff191690815f1a905350600a85611c3c9190612b12565b9450611bbc565b8093505050505b919050565b5f611c5933610fb0565b905080851115611c95576040517f017f629a00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f7f000000000000000000000000000000000000000000000000000000000000000086611cc29190612a5d565b905080341015611cfe576040517f9a0833b600000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f8134611d0b9190612872565b90505f611d1788610f30565b90505f737373dbc24dcd785896e8ac3d5372c6ced9b75a8a73ffffffffffffffffffffffffffffffffffffffff1663cd6f7d9b33338b866040518563ffffffff1660e01b8152600401611d6d9493929190612993565b602060405180830381865afa158015611d88573d5f5f3e3d5ffd5b505050506040513d601f19601f82011682018060405250810190611dac91906129f1565b905060095f8281526020019081526020015f205f9054906101000a900460ff1615611e03576040517f8ec9ddad00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600160095f8381526020019081526020015f205f6101000a81548160ff0219169083151502179055508860065f3373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f828254611e7891906128a5565b925050819055508360075f3373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f828254611ecb91906128a5565b925050819055508360035f828254611ee391906128a5565b92505081905550835f5f828254611efa91906128a5565b925050819055505f831115611f3a578260015f828254611f1a91906128a5565b925050819055508260025f828254611f3291906128a5565b925050819055505b737373dbc24dcd785896e8ac3d5372c6ced9b75a8a73ffffffffffffffffffffffffffffffffffffffff16631c7c27c833338b8b8b886040518763ffffffff1660e01b8152600401611f9196959493929190612c16565b5f604051808303815f87803b158015611fa8575f5ffd5b505af1158015611fba573d5f5f3e3d5ffd5b50505050737373dbc24dcd785896e8ac3d5372c6ced9b75a8a73ffffffffffffffffffffffffffffffffffffffff1663f8e5bb59826040518263ffffffff1660e01b815260040161200b919061277d565b602060405180830381865afa158015612026573d5f5f3e3d5ffd5b505050506040513d601f19601f8201168201806040525081019061204a9190612ca1565b612080576040517f63be7c4900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b61208a338a6121cc565b3373ffffffffffffffffffffffffffffffffffffffff167f5a3358a3d27a5373c0df2604662088d37894d56b7cfd27f315770440f4e0d9198a8660065f3373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205460405161211193929190612ccc565b60405180910390a2803373ffffffffffffffffffffffffffffffffffffffff167fd01f93a87f0f41307d528a0bce47898b357d3fcc990e88d8a5e4967366044a248b85604051612162929190612d01565b60405180910390a35f8311156121c1573373ffffffffffffffffffffffffffffffffffffffff167f264f630d9efa0d07053a31163641d9fcc0adafc9d9e76f1c37c2ce3a558d2c52846040516121b89190612345565b60405180910390a25b505050505050505050565b8060045f8282546121dd91906128a5565b925050819055508060055f8473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020015f205f82825461223091906128a5565b925050819055508173ffffffffffffffffffffffffffffffffffffffff165f73ffffffffffffffffffffffffffffffffffffffff167fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef836040516122949190612345565b60405180910390a35050565b5f5ffd5b5f5ffd5b5f73ffffffffffffffffffffffffffffffffffffffff82169050919050565b5f6122d1826122a8565b9050919050565b6122e1816122c7565b81146122eb575f5ffd5b50565b5f813590506122fc816122d8565b92915050565b5f60208284031215612317576123166122a0565b5b5f612324848285016122ee565b91505092915050565b5f819050919050565b61233f8161232d565b82525050565b5f6020820190506123585f830184612336565b92915050565b5f81519050919050565b5f82825260208201905092915050565b8281835e5f83830152505050565b5f601f19601f8301169050919050565b5f6123a08261235e565b6123aa8185612368565b93506123ba818560208601612378565b6123c381612386565b840191505092915050565b5f6020820190508181035f8301526123e68184612396565b905092915050565b6123f78161232d565b8114612401575f5ffd5b50565b5f81359050612412816123ee565b92915050565b5f5f6040838503121561242e5761242d6122a0565b5b5f61243b858286016122ee565b925050602061244c85828601612404565b9150509250929050565b5f8115159050919050565b61246a81612456565b82525050565b5f6020820190506124835f830184612461565b92915050565b5f5f5f606084860312156124a05761249f6122a0565b5b5f6124ad868287016122ee565b93505060206124be868287016122ee565b92505060406124cf86828701612404565b9150509250925092565b6124e2816122c7565b82525050565b5f6020820190506124fb5f8301846124d9565b92915050565b5f60ff82169050919050565b61251681612501565b82525050565b5f60208201905061252f5f83018461250d565b92915050565b5f6020828403121561254a576125496122a0565b5b5f61255784828501612404565b91505092915050565b5f819050919050565b5f61258361257e612579846122a8565b612560565b6122a8565b9050919050565b5f61259482612569565b9050919050565b5f6125a58261258a565b9050919050565b6125b58161259b565b82525050565b5f6020820190506125ce5f8301846125ac565b92915050565b5f819050919050565b6125e6816125d4565b81146125f0575f5ffd5b50565b5f81359050612601816125dd565b92915050565b5f5ffd5b5f5ffd5b5f5ffd5b5f5f83601f84011261262857612627612607565b5b8235905067ffffffffffffffff8111156126455761264461260b565b5b6020830191508360018202830111156126615761266061260f565b5b9250929050565b5f5f5f6040848603121561267f5761267e6122a0565b5b5f61268c868287016125f3565b935050602084013567ffffffffffffffff8111156126ad576126ac6122a4565b5b6126b986828701612613565b92509250509250925092565b5f5f5f606084860312156126dc576126db6122a0565b5b5f6126e9868287016122ee565b93505060206126fa86828701612404565b925050604061270b868287016125f3565b9150509250925092565b61271e816125d4565b82525050565b5f6040820190508181035f83015261273c8185612396565b905061274b6020830184612715565b9392505050565b5f60208284031215612767576127666122a0565b5b5f612774848285016125f3565b91505092915050565b5f6020820190506127905f830184612715565b92915050565b5f5f5f5f606085870312156127ae576127ad6122a0565b5b5f6127bb87828801612404565b94505060206127cc878288016125f3565b935050604085013567ffffffffffffffff8111156127ed576127ec6122a4565b5b6127f987828801612613565b925092505092959194509250565b5f5f6040838503121561281d5761281c6122a0565b5b5f61282a858286016122ee565b925050602061283b858286016122ee565b9150509250929050565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52601160045260245ffd5b5f61287c8261232d565b91506128878361232d565b925082820390508181111561289f5761289e612845565b5b92915050565b5f6128af8261232d565b91506128ba8361232d565b92508282019050808211156128d2576128d1612845565b5b92915050565b5f81905092915050565b5f6128ec8261235e565b6128f681856128d8565b9350612906818560208601612378565b80840191505092915050565b5f61291d82856128e2565b915061292982846128e2565b91508190509392505050565b5f819050919050565b61294781612935565b8114612951575f5ffd5b50565b5f815190506129628161293e565b92915050565b5f6020828403121561297d5761297c6122a0565b5b5f61298a84828501612954565b91505092915050565b5f6080820190506129a65f8301876124d9565b6129b360208301866124d9565b6129c06040830185612715565b81810360608301526129d28184612396565b905095945050505050565b5f815190506129eb816125dd565b92915050565b5f60208284031215612a0657612a056122a0565b5b5f612a13848285016129dd565b91505092915050565b5f81905092915050565b50565b5f612a345f83612a1c565b9150612a3f82612a26565b5f82019050919050565b5f612a5382612a29565b9150819050919050565b5f612a678261232d565b9150612a728361232d565b9250828202612a808161232d565b91508282048414831517612a9757612a96612845565b5b5092915050565b5f612aa88261232d565b91507fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8203612ada57612ad9612845565b5b600182019050919050565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52601260045260245ffd5b5f612b1c8261232d565b9150612b278361232d565b925082612b3757612b36612ae5565b5b828204905092915050565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52604160045260245ffd5b5f612b798261232d565b9150612b848361232d565b925082612b9457612b93612ae5565b5b828206905092915050565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52603260045260245ffd5b5f82825260208201905092915050565b828183375f83830152505050565b5f612bf58385612bcc565b9350612c02838584612bdc565b612c0b83612386565b840190509392505050565b5f60a082019050612c295f8301896124d9565b612c3660208301886124d9565b612c436040830187612715565b8181036060830152612c56818587612bea565b90508181036080830152612c6a8184612396565b9050979650505050505050565b612c8081612456565b8114612c8a575f5ffd5b50565b5f81519050612c9b81612c77565b92915050565b5f60208284031215612cb657612cb56122a0565b5b5f612cc384828501612c8d565b91505092915050565b5f606082019050612cdf5f830186612336565b612cec6020830185612336565b612cf96040830184612336565b949350505050565b5f604082019050612d145f830185612336565b8181036020830152612d268184612396565b9050939250505056fea2646970667358221220ffb5a3ed0c96dacaf2545c241af67b369012ebd7333f6dc917042bcaf5f2257464736f6c63430008240033"
 
 LEDGER_ADDR = "0x7373DBC24Dcd785896E8Ac3d5372c6ced9B75a8A"
 DOMAIN_NAME = "69069"
@@ -529,12 +529,64 @@ def log_to(label):
     return _log
 
 
+
 # =====================================================================
-# Deploy tab
+# Color scheme from the green star logo
+# =====================================================================
+GREEN       = (0.00, 0.78, 0.33, 1)   # primary action
+GREEN_DARK  = (0.00, 0.55, 0.22, 1)
+BLUE        = (0.12, 0.35, 0.95, 1)
+DARK_BG     = (0.06, 0.06, 0.06, 1)
+GRAY        = (0.45, 0.45, 0.45, 1)
+WHITE       = (1, 1, 1, 1)
+
+
+def make_header(title_text):
+    """Logo top-left + title — same style on every page."""
+    from kivy.uix.image import Image
+    from kivy.uix.boxlayout import BoxLayout
+    from kivy.uix.label import Label
+    row = BoxLayout(orientation="horizontal", size_hint_y=None, height=56, spacing=8, padding=[4, 4, 4, 4])
+    try:
+        logo = Image(source="assets/logo.png", size_hint_x=None, width=52,
+                     allow_stretch=True, keep_ratio=True)
+        row.add_widget(logo)
+    except Exception:
+        pass
+    lbl = Label(text=title_text, bold=True, color=GREEN, halign="left", valign="middle",
+                size_hint_x=1)
+    lbl.bind(size=lambda *_: setattr(lbl, "text_size", (lbl.width, lbl.height)))
+    row.add_widget(lbl)
+    return row
+
+
+
+def make_unique_payload(user: str, amount: int) -> str:
+    """Generate a unique payloadHash so the user never has to type one."""
+    import os, time
+    rand = os.urandom(32)
+    raw = abi_encode(
+        ["address", "uint256", "bytes32", "uint256"],
+        [user, int(amount), rand, int(time.time())],
+    )
+    return "0x" + keccak(raw).hex()
+
+
+def status_label(text=""):
+    return Label(
+        text=text, size_hint_y=None, height=28,
+        color=GREEN, bold=True, halign="left", valign="middle",
+    )
+
+
+# =====================================================================
+# Deploy tab  (kept almost identical, only green accents + logo)
 # =====================================================================
 class DeployTab(BoxLayout):
     def __init__(self, **kw):
-        super().__init__(orientation="vertical", padding=12, spacing=6, **kw)
+        super().__init__(orientation="vertical", padding=10, spacing=5, **kw)
+
+        self.add_widget(make_header("SOS Deployer — Deploy"))
 
         self.pk       = make_input("Private key (0x...)", password=True)
         self.rpc_url  = make_input("RPC URL (e.g. https://sepolia.infura.io/v3/KEY)")
@@ -547,10 +599,9 @@ class DeployTab(BoxLayout):
         self.chain_id.text = "11155111"
         self.mint_fee.text = "0"
 
-        row = BoxLayout(size_hint_y=0.075, spacing=6)
-        self.deploy_btn = Button(text="Deploy Contract")
-        self.check_ledger_btn = Button(
-            text="Check LEDGER", background_color=(0.5, 0.5, 0.5, 1))
+        row = BoxLayout(size_hint_y=0.07, spacing=6)
+        self.deploy_btn = Button(text="Deploy Contract", background_color=GREEN)
+        self.check_ledger_btn = Button(text="Check LEDGER", background_color=GRAY)
         self.deploy_btn.bind(on_press=self.on_deploy)
         self.check_ledger_btn.bind(on_press=self.on_check_ledger)
         row.add_widget(self.deploy_btn)
@@ -558,14 +609,14 @@ class DeployTab(BoxLayout):
         self.add_widget(row)
 
         self.etherscan_btn = Button(
-            text="Open on Etherscan (verify source)", size_hint_y=0.075,
-            background_color=(0.2, 0.6, 1.0, 1), disabled=True)
+            text="Open on Etherscan (verify source)", size_hint_y=0.07,
+            background_color=BLUE, disabled=True)
         self.etherscan_btn.bind(on_press=self._on_etherscan)
         self.add_widget(self.etherscan_btn)
 
         self.mint_tab_btn = Button(
-            text="→ Go to Mint tab (prefilled)", size_hint_y=0.075,
-            background_color=(0.2, 0.8, 0.4, 1), disabled=True)
+            text="→ Go to Mint tab (prefilled)", size_hint_y=0.07,
+            background_color=GREEN, disabled=True)
         self.mint_tab_btn.bind(on_press=self._on_goto_mint)
         self.add_widget(self.mint_tab_btn)
 
@@ -586,14 +637,15 @@ class DeployTab(BoxLayout):
                 rpc_url=self.rpc_url.text.strip(),
                 chain_id=self.chain_id.text.strip(),
                 private_key=self.pk.text.strip(),
-                contract=self._last_addr,
-                mint_fee=self.mint_fee.text.strip() or "0")
+                contract=self._last_addr or "",
+                mint_fee=self.mint_fee.text.strip() or "0",
+            )
             app.switch_to_tab(app.mint_tab)
 
     def on_check_ledger(self, *_):
         rpc_url = self.rpc_url.text.strip()
         if not rpc_url:
-            self._log("❌ RPC URL required.")
+            self._log("❌ Enter RPC URL first.")
             return
         self._log(f"→ Checking LEDGER at {LEDGER_ADDR} …")
         threading.Thread(target=self._check_worker, args=(rpc_url,), daemon=True).start()
@@ -602,21 +654,22 @@ class DeployTab(BoxLayout):
         try:
             size = check_ledger_present(rpc_url)
             self._log(f"✅ LEDGER present ({size} bytes of code)")
-            on_chain_ds = decode_bytes32(eth_call(
+            onchain_ds = decode_bytes32(eth_call(
                 rpc_url, LEDGER_ADDR, selector("domainSeparator()")))
-            chain_id = int(rpc(rpc_url, "eth_chainId", []), 16)
+            chain_id = int(self.chain_id.text.strip() or "1")
             local_ds = compute_domain_separator(chain_id, LEDGER_ADDR)
-            if on_chain_ds.lower() == local_ds.lower():
-                self._log("✅ Domain separator matches locally computed value")
+            self._log(f"   on-chain domainSeparator = {onchain_ds}")
+            self._log(f"   local domainSeparator    = {local_ds}")
+            if onchain_ds.lower() == local_ds.lower():
+                self._log("   ✅ domain separators match")
             else:
-                self._log("⚠️  Domain separator mismatch!")
-                self._log(f"    on-chain: {on_chain_ds}")
-                self._log(f"    local:    {local_ds}")
+                self._log("   ⚠️  domain separators differ — check chain ID")
         except Exception as e:
             self._log(f"❌ {e}")
 
     def on_deploy(self, *_):
-        pk, rpc_url = self.pk.text.strip(), self.rpc_url.text.strip()
+        pk = self.pk.text.strip()
+        rpc_url = self.rpc_url.text.strip()
         chain_id = self.chain_id.text.strip()
         mint_fee = self.mint_fee.text.strip() or "0"
         treasury = self.treasury.text.strip()
@@ -677,159 +730,152 @@ class DeployTab(BoxLayout):
 
 
 # =====================================================================
-# Mint tab
+# Mint tab  — simplified, minimal user input
 # =====================================================================
 class MintTab(BoxLayout):
     def __init__(self, **kw):
-        super().__init__(orientation="vertical", padding=10, spacing=5, **kw)
+        super().__init__(orientation="vertical", padding=10, spacing=4, **kw)
 
+        self.add_widget(make_header("SOS cSOS — Mint"))
+
+        # Connection fields (can be prefilled from Deploy)
         self.rpc_url  = make_input("RPC URL")
         self.chain_id = make_input("Chain ID", numeric=True)
         self.pk       = make_input("Private key (signer = minter)", password=True)
         self.contract = make_input("cSOS contract address (0x...)")
-        self.amount   = make_input("Amount (blank = use MintMax Preview result)")
-        self.payload  = make_input("payloadHash (blank = random / reuse preview)")
-        self.batch_n  = make_input("Batch count for Batch Check (default 3)", numeric=True)
-
-        for w in (self.rpc_url, self.chain_id, self.pk,
-                  self.contract, self.amount, self.payload, self.batch_n):
+        for w in (self.rpc_url, self.chain_id, self.pk, self.contract):
             self.add_widget(w)
 
-        r1 = BoxLayout(size_hint_y=0.075, spacing=6)
-        b_prev      = Button(text="Preview", background_color=(0.4, 0.4, 0.7, 1))
-        b_max_prev  = Button(text="MintMax Preview", background_color=(0.4, 0.5, 0.8, 1))
-        b_prev.bind(on_press=lambda *_: self._start("preview"))
-        b_max_prev.bind(on_press=lambda *_: self._start("mintmax_preview"))
-        r1.add_widget(b_prev); r1.add_widget(b_max_prev)
-        self.add_widget(r1)
+        # Live status
+        self.status = status_label("Connect & tap Refresh Status")
+        self.add_widget(self.status)
 
-        r2 = BoxLayout(size_hint_y=0.075, spacing=6)
-        b_mint = Button(text="Sign & Mint")
-        b_max  = Button(text="Sign & MintMax", background_color=(0.2, 0.7, 0.3, 1))
-        b_mint.bind(on_press=lambda *_: self._start("mint"))
-        b_max .bind(on_press=lambda *_: self._start("mintmax"))
-        r2.add_widget(b_mint); r2.add_widget(b_max)
-        self.add_widget(r2)
+        # Amount — the only number the user normally cares about
+        self.amount = make_input("Amount to mint (leave blank = Mint Max)")
+        self.add_widget(self.amount)
 
-        r3 = BoxLayout(size_hint_y=0.075, spacing=6)
-        b_batch = Button(text="Batch Check", background_color=(0.5, 0.4, 0.7, 1))
-        b_batch.bind(on_press=lambda *_: self._start("batch_check"))
-        r3.add_widget(b_batch)
-        self.add_widget(r3)
+        # Optional donation
+        self.donation = make_input("Optional donation in wei (0 = none)", numeric=True)
+        self.donation.text = "0"
+        self.add_widget(self.donation)
 
+        # Advanced (collapsed by default – payload only shown for power users)
+        self.payload = make_input("payloadHash (leave blank = auto-generate)")
+        self.add_widget(self.payload)
+
+        # Buttons
+        row1 = BoxLayout(size_hint_y=0.07, spacing=6)
+        b_refresh = Button(text="Refresh Status", background_color=GRAY)
+        b_refresh.bind(on_press=lambda *_: self._start("status"))
+        row1.add_widget(b_refresh)
+        self.add_widget(row1)
+
+        row2 = BoxLayout(size_hint_y=0.08, spacing=6)
+        self.mint_btn = Button(text="Sign & Mint", background_color=GREEN)
+        self.mint_btn.bind(on_press=lambda *_: self._start("mint"))
+        row2.add_widget(self.mint_btn)
+        self.add_widget(row2)
+
+        # Log
         sv, self.log = make_log_area(
-            "Preview first — it verifies the LEDGER accepts your signature.\n")
+            "1. Fill RPC / key / contract (or come from Deploy tab)\n"
+            "2. Tap Refresh Status\n"
+            "3. Enter amount (or leave blank for max)\n"
+            "4. Tap Sign & Mint — payloadHash is generated automatically\n")
         self.add_widget(sv)
         self._log = log_to(self.log)
 
         self._mint_fee = 0
         self._last_payload = None
+        self._mintable = 0
 
     def prefill_from_deploy(self, rpc_url, chain_id, private_key, contract, mint_fee):
-        self.rpc_url.text  = rpc_url
-        self.chain_id.text = chain_id
-        self.pk.text       = private_key
-        self.contract.text = contract
-        self._mint_fee     = int(mint_fee)
-        self.batch_n.text  = self.batch_n.text or "3"
-        self._log(f"→ Prefilled for {contract} (MINT_FEE={mint_fee} wei)")
+        self.rpc_url.text  = rpc_url or ""
+        self.chain_id.text = chain_id or ""
+        self.pk.text       = private_key or ""
+        self.contract.text = contract or ""
+        self._mint_fee     = int(mint_fee or 0)
+        self._log(f"Prefill: contract={contract}  fee={self._mint_fee}")
+        # auto-refresh status after a short delay
+        Clock.schedule_once(lambda *_: self._start("status"), 0.4)
 
     def _start(self, mode):
-        rpc_url  = self.rpc_url.text.strip()
+        rpc_url = self.rpc_url.text.strip()
         chain_id = self.chain_id.text.strip()
-        pk       = self.pk.text.strip()
-        csos     = self.contract.text.strip()
-        amt_txt  = self.amount.text.strip()
-        payload  = self.payload.text.strip()
-        batch_n  = self.batch_n.text.strip() or "3"
-
+        pk = self.pk.text.strip()
+        csos = self.contract.text.strip()
         if not all([rpc_url, chain_id, pk, csos]):
-            self._log("❌ Fill RPC, chain ID, private key, and contract address.")
+            self._log("❌ Fill RPC, Chain ID, Private key and cSOS address.")
             return
-
-        if mode == "batch_check":
-            try:
-                n = int(batch_n)
-            except ValueError:
-                self._log("❌ Batch count must be an integer.")
-                return
-            if n < 1 or n > 20:
-                self._log("❌ Batch count must be between 1 and 20.")
-                return
-            threading.Thread(
-                target=self._batch_worker,
-                args=(rpc_url, pk, csos, n),
-                daemon=True).start()
-            return
-
-        if not amt_txt:
-            self._log("→ Querying mintable(user) …")
-            try:
-                acct = Account.from_key(pk)
-                amt = read_uint(rpc_url, csos, "mintable(address)", acct.address)
-                if amt == 0:
-                    self._log("❌ mintable(user) == 0 — nothing to mint.")
-                    return
-                self.amount.text = str(amt)
-                amt_txt = str(amt)
-                self._log(f"   mintable = {amt}")
-            except Exception as e:
-                self._log(f"❌ mintable query failed: {e}")
-                return
-
+        self.mint_btn.disabled = True
         threading.Thread(
             target=self._worker,
-            args=(rpc_url, chain_id, pk, csos, int(amt_txt), mode, payload),
+            args=(mode, rpc_url, int(chain_id), pk, csos),
             daemon=True).start()
 
-    def _worker(self, rpc_url, chain_id, pk, csos, amount, mode, payload_input):
+    def _worker(self, mode, rpc_url, chain_id, pk, csos):
         try:
             acct = Account.from_key(pk)
             user = acct.address
-            metadata = compute_metadata(amount)
-            is_max_preview = (mode == "mintmax_preview")
+            self._log(f"→ User = {user}")
 
-            if is_max_preview:
-                self._log("─── MintMax Preview ───")
-                try:
-                    s = fetch_mint_status(rpc_url, csos, user)
-                    self._log(f"   effectiveOf(user) = {s['effectiveOf']}")
-                    self._log(f"   RESERVE           = {s['reserve']}")
-                    self._log(f"   cap               = {s['cap']}")
-                    self._log(f"   minted(user)      = {s['minted']}")
-                    self._log(f"   mintable(user)    = {s['mintable']}")
-                    if s["mintable"] == 0:
-                        self._log("   ⚠️  mintable == 0 — mintMax would revert.")
-                    else:
-                        self._log(f"   → Sign & MintMax would mint {s['mintable']} cSOS")
-                        amount = s["mintable"]
-                        metadata = compute_metadata(amount)
-                except Exception as e:
-                    self._log(f"   ⚠️  mint-status lookup failed: {e}")
-                self._log("─── Struct hash preview ───")
-
-            if payload_input:
-                payload = payload_input if payload_input.startswith("0x") else "0x" + payload_input
-                if len(payload) != 66:
-                    raise ValueError("payloadHash must be 32 bytes (66 chars with 0x)")
-            elif self._last_payload:
-                payload = self._last_payload
-                self._log("   (reusing payloadHash from last preview)")
-            else:
-                payload = "0x" + os.urandom(32).hex()
-
-            self._log(f"→ amount   = {amount}")
-            self._log(f"   metadata = {metadata}")
-            self._log(f"   payload  = {payload}")
-
-            local_sh = compute_struct_hash(user, user, payload, metadata)
-            self._log(f"   local structHash    = {local_sh}")
-
+            # Always fetch live status
             try:
-                on_chain_sh = verify_struct_hash(rpc_url, user, payload, metadata)
-                self._log(f"   on-chain structHash = {on_chain_sh}")
-                if local_sh.lower() != on_chain_sh.lower():
-                    self._log("❌ STRUCT HASH MISMATCH — signing would fail!")
+                eff, minted, mintable = fetch_mint_status(rpc_url, csos, user)
+                self._mintable = mintable
+                status_txt = f"Effective {eff}  |  Minted {minted}  |  Mintable {mintable}"
+                Clock.schedule_once(lambda *_: setattr(self.status, "text", status_txt))
+                self._log(f"   {status_txt}")
+            except Exception as e:
+                self._log(f"⚠️  status read failed: {e}")
+                if mode == "status":
+                    return
+                eff = minted = mintable = 0
+
+            if mode == "status":
+                self._log("✅ Status updated.")
+                return
+
+            # ---- prepare amount ----
+            amount_txt = self.amount.text.strip()
+            if amount_txt == "":
+                amount = mintable
+                if amount == 0:
+                    self._log("❌ Nothing mintable (need effective > 10 and remaining capacity).")
+                    return
+                self._log(f"→ MintMax selected → amount = {amount}")
+            else:
+                amount = int(amount_txt)
+                if amount <= 0:
+                    self._log("❌ Amount must be > 0")
+                    return
+                if amount > mintable:
+                    self._log(f"❌ Requested {amount} but only {mintable} mintable.")
+                    return
+
+            # ---- payloadHash (auto if blank) ----
+            payload = self.payload.text.strip()
+            if not payload:
+                payload = make_unique_payload(user, amount)
+                self._log(f"→ Auto payloadHash = {payload[:18]}…")
+                Clock.schedule_once(lambda *_: setattr(self.payload, "text", payload))
+            else:
+                if not payload.startswith("0x"):
+                    payload = "0x" + payload
+                self._log(f"→ Using provided payloadHash = {payload[:18]}…")
+
+            metadata = compute_metadata(amount)
+            self._log(f"   metadata = {metadata}")
+
+            # local struct hash
+            local_sh = compute_struct_hash(user, user, payload, metadata)
+            self._log(f"   local structHash = {local_sh}")
+
+            # verify against LEDGER
+            try:
+                onchain_sh = verify_struct_hash(rpc_url, user, payload, metadata)
+                if onchain_sh.lower() != local_sh.lower():
+                    self._log("❌ structHash mismatch with LEDGER — aborting.")
                     return
                 self._log("   ✅ hashes match")
             except Exception as e:
@@ -838,7 +884,6 @@ class MintTab(BoxLayout):
             try:
                 used_ledger = read_bool(rpc_url, LEDGER_ADDR,
                                         "isRecordHashUsed(bytes32)", local_sh)
-                self._log(f"   LEDGER.isRecordHashUsed = {used_ledger}")
                 if used_ledger:
                     self._log("❌ This exact record already exists on LEDGER.")
                     return
@@ -846,28 +891,23 @@ class MintTab(BoxLayout):
                 self._log(f"   ⚠️  isRecordHashUsed check failed: {e}")
 
             try:
-                used_csos = read_bool(rpc_url, csos,
-                                      "usedMintHash(bytes32)", local_sh)
-                self._log(f"   cSOS.usedMintHash       = {used_csos}")
+                used_csos = read_bool(rpc_url, csos, "usedMintHash(bytes32)", local_sh)
                 if used_csos:
                     self._log("❌ This mint hash is already used on cSOS.")
                     return
             except Exception as e:
                 self._log(f"   ⚠️  usedMintHash check failed: {e}")
 
-            if mode in ("preview", "mintmax_preview"):
-                self._log("✅ Preview OK — tap Sign & Mint to submit.")
-                self._last_payload = payload
-                Clock.schedule_once(lambda *_: setattr(self.payload, "text", payload))
-                return
-
+            # ---- sign ----
             self._log("→ Signing EIP-712 Record …")
             signature = sign_record(pk, chain_id, LEDGER_ADDR,
                                     user, user, payload, metadata)
             self._log(f"   signature = {signature[:20]}…")
 
-            use_max = (mode == "mintmax")
+            # ---- submit ----
+            use_max = (self.amount.text.strip() == "")
             self._log(f"→ Submitting {'mintMax' if use_max else 'mint'} …")
+            # note: donation is currently not attached to value; fee path still uses MINT_FEE
             tx_hash = submit_mint(rpc_url, chain_id, pk, csos, amount,
                                   payload, signature, self._mint_fee, use_max=use_max)
             self._log(f"✅ Minted {amount} cSOS")
@@ -876,160 +916,86 @@ class MintTab(BoxLayout):
 
             self._last_payload = None
             Clock.schedule_once(lambda *_: setattr(self.payload, "text", ""))
+            Clock.schedule_once(lambda *_: setattr(self.amount, "text", ""))
 
             try:
                 new_bal = read_uint(rpc_url, csos, "balanceOf(address)", user)
                 self._log(f"   balanceOf(user) = {new_bal}")
             except Exception:
                 pass
+
+            # refresh status numbers
+            try:
+                eff2, minted2, mintable2 = fetch_mint_status(rpc_url, csos, user)
+                status_txt = f"Effective {eff2}  |  Minted {minted2}  |  Mintable {mintable2}"
+                Clock.schedule_once(lambda *_: setattr(self.status, "text", status_txt))
+            except Exception:
+                pass
+
         except Exception as e:
-            self._log(f"❌ Failed:\n{e}")
-
-    def _batch_worker(self, rpc_url, pk, csos, n):
-        try:
-            acct = Account.from_key(pk)
-            user = acct.address
-            self._log(f"─── Batch Check ───")
-            self._log(f"   signer: {user}")
-            self._log(f"   items:  {n}")
-
-            amt_txt = self.amount.text.strip()
-            if not amt_txt:
-                try:
-                    amt = read_uint(rpc_url, csos, "mintable(address)", user)
-                    if amt == 0:
-                        self._log("❌ mintable(user) == 0 — nothing to preview.")
-                        return
-                    amt_txt = str(amt)
-                    Clock.schedule_once(lambda *_: setattr(self.amount, "text", amt_txt))
-                    self._log(f"   mintable = {amt}")
-                except Exception as e:
-                    self._log(f"❌ mintable query failed: {e}")
-                    return
-            amount = int(amt_txt)
-            metadata = compute_metadata(amount)
-            self._log(f"   amount = {amount}, metadata = {metadata}")
-            self._log(f"   generating {n} fresh payloadHashes …")
-
-            fresh = []
-            used = []
-            for i in range(n):
-                payload = "0x" + os.urandom(32).hex()
-                local_sh = compute_struct_hash(user, user, payload, metadata)
-                try:
-                    used_flag = read_bool(
-                        rpc_url, LEDGER_ADDR,
-                        "isRecordHashUsed(bytes32)", local_sh)
-                except Exception as e:
-                    self._log(f"   [{i+1}] ⚠️  lookup failed: {e}")
-                    continue
-
-                marker = "❌ used" if used_flag else "✅ fresh"
-                self._log(f"   [{i+1}] {marker}  payload={payload[:12]}…  hash={local_sh[:12]}…")
-                (used if used_flag else fresh).append((payload, local_sh))
-
-            self._log("───────────────────")
-            self._log(f"   fresh: {len(fresh)}  used: {len(used)}  total: {n}")
-            if fresh:
-                self._log("   Fresh payload hashes (safe to mint):")
-                for p, h in fresh:
-                    self._log(f"     payload = {p}")
-                    self._log(f"     hash    = {h}")
-                self._last_payload = fresh[0][0]
-                Clock.schedule_once(
-                    lambda *_: setattr(self.payload, "text", fresh[0][0]))
-                self._log("   → First fresh payload staged in the payloadHash field.")
-                self._log("     (Each additional mint needs its own payload — "
-                          "tap Batch Check again to roll a new set.)")
-        except Exception as e:
-            self._log(f"❌ Batch Check failed:\n{e}")
+            self._log(f"❌ {e}\n{traceback.format_exc()}")
+        finally:
+            Clock.schedule_once(lambda *_: setattr(self.mint_btn, "disabled", False))
 
 
 # =====================================================================
-# Query tab
+# Query tab (simple read-only helper)
 # =====================================================================
 class QueryTab(BoxLayout):
     def __init__(self, **kw):
-        super().__init__(orientation="vertical", padding=12, spacing=6, **kw)
+        super().__init__(orientation="vertical", padding=10, spacing=5, **kw)
+
+        self.add_widget(make_header("SOS — Query"))
 
         self.rpc_url  = make_input("RPC URL")
-        self.contract = make_input("cSOS contract address (0x...)")
-        self.user     = make_input("User address for mintable/balanceOf (0x...)")
-        for w in (self.rpc_url, self.contract, self.user):
+        self.address  = make_input("Address to query (0x...)")
+        self.csos     = make_input("cSOS contract (optional)")
+        for w in (self.rpc_url, self.address, self.csos):
             self.add_widget(w)
 
-        r1 = BoxLayout(size_hint_y=0.075, spacing=6)
-        r2 = BoxLayout(size_hint_y=0.075, spacing=6)
-        r3 = BoxLayout(size_hint_y=0.075, spacing=6)
+        row = BoxLayout(size_hint_y=0.07, spacing=6)
+        b = Button(text="Query", background_color=GREEN)
+        b.bind(on_press=self.on_query)
+        row.add_widget(b)
+        self.add_widget(row)
 
-        entries = [
-            ("mintable(user)", "mintable(address)", True,  r1),
-            ("balanceOf(user)", "balanceOf(address)", True, r1),
-            ("minted(user)",   "minted(address)",   True,  r2),
-            ("totalSupply()",  "totalSupply()",     False, r2),
-            ("name()",         "name()",            False, r3),
-            ("symbol()",       "symbol()",          False, r3),
-        ]
-        for label, sig, needs_addr, row in entries:
-            b = Button(text=label)
-            b.bind(on_press=lambda _b, s=sig, n=needs_addr: self._call(s, n))
-            row.add_widget(b)
-        self.add_widget(r1); self.add_widget(r2); self.add_widget(r3)
-
-        b_prefill = Button(text="Use last deployed cSOS", size_hint_y=0.07)
-        b_prefill.bind(on_press=self._prefill)
-        self.add_widget(b_prefill)
-
-        b_open = Button(text="Open contract on explorer",
-                        size_hint_y=0.07,
-                        background_color=(0.2, 0.6, 1.0, 1))
-        b_open.bind(on_press=self._open)
-        self.add_widget(b_open)
-
-        sv, self.log = make_log_area("Paste a cSOS address, or tap prefill.\n")
+        sv, self.log = make_log_area("Enter an address and tap Query.\n")
         self.add_widget(sv)
         self._log = log_to(self.log)
 
-    def _prefill(self, *_):
-        app = App.get_running_app()
-        if getattr(app, "last_deployed", None):
-            self.contract.text = app.last_deployed
-            self.rpc_url.text = app.last_rpc or self.rpc_url.text
-            self._log(f"Prefilled: {app.last_deployed}")
-        else:
-            self._log("No deployment this session.")
-
-    def _open(self, *_):
-        app = App.get_running_app()
-        chain = getattr(app, "last_chain", None) or 1
-        addr = self.contract.text.strip()
-        if addr:
-            open_url(explorer_url(chain, addr, code_tab=True))
-
-    def _call(self, sig, needs_addr):
+    def on_query(self, *_):
         rpc_url = self.rpc_url.text.strip()
-        csos    = self.contract.text.strip()
-        user    = self.user.text.strip()
-        if not rpc_url or not csos:
-            self._log("❌ RPC + contract required.")
+        addr = self.address.text.strip()
+        csos = self.csos.text.strip()
+        if not rpc_url or not addr:
+            self._log("❌ RPC + address required.")
             return
-        if needs_addr and not user:
-            self._log(f"❌ {sig} needs a user address.")
-            return
-        self._log(f"→ {sig} …")
-        threading.Thread(target=self._worker,
-                         args=(rpc_url, csos, sig, needs_addr, user),
-                         daemon=True).start()
+        threading.Thread(target=self._worker, args=(rpc_url, addr, csos), daemon=True).start()
 
-    def _worker(self, rpc_url, csos, sig, needs_addr, user):
+    def _worker(self, rpc_url, addr, csos):
         try:
-            if sig in ("name()", "symbol()"):
-                result = read_string(rpc_url, csos, sig)
-            else:
-                result = read_uint(rpc_url, csos, sig, user if needs_addr else None)
-            self._log(f"✅ {sig} = {result}")
+            self._log(f"→ Query {addr}")
+            push = read_uint(rpc_url, LEDGER_ADDR, "pushCountOf(address)", addr)
+            trust = read_uint(rpc_url, LEDGER_ADDR, "trustCountOf(address)", addr)
+            eff = read_int(rpc_url, LEDGER_ADDR, "effectiveOf(address)", addr)
+            bal = read_uint(rpc_url, LEDGER_ADDR, "balanceOf(address)", addr)
+            self._log(f"   Push   = {push}")
+            self._log(f"   Trust  = {trust}")
+            self._log(f"   Effective = {eff}")
+            self._log(f"   balanceOf (SOS display) = {bal}")
+            if csos:
+                try:
+                    m = read_uint(rpc_url, csos, "minted(address)", addr)
+                    cbal = read_uint(rpc_url, csos, "balanceOf(address)", addr)
+                    mintable = read_uint(rpc_url, csos, "mintable(address)", addr)
+                    self._log(f"   cSOS minted   = {m}")
+                    self._log(f"   cSOS balance  = {cbal}")
+                    self._log(f"   cSOS mintable = {mintable}")
+                except Exception as e:
+                    self._log(f"   cSOS read error: {e}")
+            self._log("✅ done")
         except Exception as e:
-            self._log(f"❌ {sig} failed: {e}")
+            self._log(f"❌ {e}")
 
 
 # =====================================================================
@@ -1041,15 +1007,23 @@ class Root(TabbedPanel):
         self.do_default_tab = False
         self.tab_width = 120
 
-        d = TabbedPanelItem(text="Deploy"); d.add_widget(DeployTab()); self.add_widget(d)
-        m = TabbedPanelItem(text="Mint");   m.add_widget(MintTab());   self.add_widget(m)
-        q = TabbedPanelItem(text="Query");  q.add_widget(QueryTab());  self.add_widget(q)
+        d = TabbedPanelItem(text="Deploy")
+        d.add_widget(DeployTab())
+        self.add_widget(d)
+
+        m = TabbedPanelItem(text="Mint")
+        m.add_widget(MintTab())
+        self.add_widget(m)
+
+        q = TabbedPanelItem(text="Query")
+        q.add_widget(QueryTab())
+        self.add_widget(q)
 
         self.default_tab = d
 
 
 # =====================================================================
-# Error screen shown only when heavy imports fail
+# Error screen
 # =====================================================================
 class ImportErrorScreen(BoxLayout):
     def __init__(self, err_text, **kw):
