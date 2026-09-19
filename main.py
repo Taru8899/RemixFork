@@ -17,6 +17,9 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
+from kivy.core.window import Window
+from kivy.utils import get_color_from_hex
+from kivy.metrics import dp
 from kivy.uix.textinput import TextInput
 
 # =====================================================================
@@ -251,6 +254,25 @@ def open_url(url: str):
 def explorer_url(chain_id, address, code_tab=False):
     host = EXPLORER_HOSTS.get(int(chain_id), "etherscan.io")
     return f"https://{host}/address/{address}{'#code' if code_tab else ''}"
+
+
+def explorer_tx_url(chain_id, tx_hash) -> str:
+    host = EXPLORER_HOSTS.get(int(chain_id), "etherscan.io")
+    h = tx_hash if str(tx_hash).startswith("0x") else "0x" + str(tx_hash)
+    return f"https://{host}/tx/{h}"
+
+
+def signed_raw_hex(signed) -> str:
+    """eth-account 0.10 uses rawTransaction; newer uses raw_transaction."""
+    raw = getattr(signed, "raw_transaction", None)
+    if raw is None:
+        raw = getattr(signed, "rawTransaction", None)
+    if raw is None:
+        raise AttributeError("SignedTransaction has neither raw_transaction nor rawTransaction")
+    if isinstance(raw, (bytes, bytearray)):
+        return "0x" + bytes(raw).hex()
+    s = raw.hex() if hasattr(raw, "hex") else str(raw)
+    return s if s.startswith("0x") else "0x" + s
 
 
 # =====================================================================
@@ -513,8 +535,7 @@ def deploy_contract(rpc_url, chain_id, private_key, mint_fee, treasury):
         "to": None, "value": 0, "data": data, "chainId": int(chain_id),
     }
     signed = acct.sign_transaction(tx)
-    raw = signed.raw_transaction.hex()
-    raw = raw if raw.startswith("0x") else "0x" + raw
+    raw = signed_raw_hex(signed)
     tx_hash = rpc(rpc_url, "eth_sendRawTransaction", [raw])
     receipt = wait_for_receipt(rpc_url, tx_hash)
     return receipt["contractAddress"], tx_hash
@@ -553,8 +574,7 @@ def submit_mint(rpc_url, chain_id, private_key, csos_addr, amount,
         "to": csos_addr, "value": value, "data": data, "chainId": int(chain_id),
     }
     signed = acct.sign_transaction(tx)
-    raw = signed.raw_transaction.hex()
-    raw = raw if raw.startswith("0x") else "0x" + raw
+    raw = signed_raw_hex(signed)
     tx_hash = rpc(rpc_url, "eth_sendRawTransaction", [raw])
     wait_for_receipt(rpc_url, tx_hash)
     return tx_hash
@@ -567,13 +587,25 @@ def make_input(hint, password=False, numeric=False, height=0.055, text=""):
     return TextInput(
         hint_text=hint, password=password, multiline=False,
         input_filter="int" if numeric else None,
-        size_hint_y=height, text=text,
+        size_hint_y=None,
+        height=46,
+        text=text,
+        background_normal="",
+        background_active="",
+        background_color=INPUT_BG,
+        foreground_color=TEXT,
+        cursor_color=BLUE_SOFT,
+        padding=[12, 12],
+        font_size="14sp",
+        write_tab=False,
+        hint_text_color=TEXT_MUTED,
     )
 
 
 def make_log_area(initial=""):
-    sv = ScrollView()
-    lbl = Label(text=initial, size_hint_y=None, halign="left", valign="top")
+    sv = ScrollView(bar_width=0, do_scroll_x=False)
+    lbl = Label(text=initial, size_hint_y=None, halign="left", valign="top",
+                color=TEXT_SEC, font_size="13sp")
     lbl.bind(width=lambda *_: setattr(lbl, "text_size", (lbl.width, None)))
     lbl.bind(texture_size=lambda *_: setattr(lbl, "height", lbl.texture_size[1]))
     sv.add_widget(lbl)
@@ -588,40 +620,48 @@ def log_to(label):
 
 
 # =====================================================================
-# Color scheme from the green star logo
+# Theme (aligned with SOS69069APP theme.py)
 # =====================================================================
-GREEN       = (0.00, 0.78, 0.33, 1)   # primary action
-GREEN_DARK  = (0.00, 0.55, 0.22, 1)
-BLUE        = (0.12, 0.35, 0.95, 1)
-DARK_BG     = (0.06, 0.06, 0.06, 1)
-GRAY        = (0.45, 0.45, 0.45, 1)
-WHITE       = (1, 1, 1, 1)
+BG          = get_color_from_hex("#0a0e0b")
+CARD_BG     = get_color_from_hex("#141b16")
+INPUT_BG    = get_color_from_hex("#232f27")
+BORDER      = get_color_from_hex("#2c3830")
+TEXT        = get_color_from_hex("#ffffff")
+TEXT_SEC    = get_color_from_hex("#bbbbbb")
+TEXT_MUTED  = get_color_from_hex("#9ca3af")
+GREEN       = get_color_from_hex("#04aa34")
+GREEN_BR    = get_color_from_hex("#22c55e")
+BLUE        = get_color_from_hex("#0038fe")
+BLUE_SOFT   = get_color_from_hex("#5b8bff")
+YELLOW      = get_color_from_hex("#facc15")
+ORANGE      = get_color_from_hex("#f97316")
+DANGER      = get_color_from_hex("#ef4444")
+GRAY        = INPUT_BG
+WHITE       = TEXT
+
+try:
+    Window.clearcolor = BG
+except Exception:
+    pass
 
 
-def make_header(title_text):
-    """Logo top-left + title + version — same style on every page."""
+def make_header(title_text="SOS Deployer"):
+    """Logo top-left + title only (NO version here — version is splash-only)."""
     from kivy.uix.image import Image
-    from kivy.uix.boxlayout import BoxLayout
-    from kivy.uix.label import Label
-    row = BoxLayout(orientation="horizontal", size_hint_y=None, height=56, spacing=8, padding=[4, 4, 4, 4])
+    row = BoxLayout(orientation="horizontal", size_hint_y=None, height=dp(52),
+                    spacing=dp(10), padding=[dp(12), dp(8), dp(8), dp(4)])
     try:
-        logo = Image(source="assets/logo.png", size_hint_x=None, width=52,
-                     allow_stretch=True, keep_ratio=True)
+        logo = Image(source="assets/logo.png", size_hint=(None, None),
+                     size=(dp(40), dp(40)), allow_stretch=True, keep_ratio=True)
         row.add_widget(logo)
     except Exception:
-        pass
-    mid = BoxLayout(orientation="vertical", size_hint_x=1)
-    lbl = Label(text=title_text, bold=True, color=GREEN, halign="left", valign="bottom",
-                size_hint_y=0.6)
-    lbl.bind(size=lambda *_: setattr(lbl, "text_size", (lbl.width, lbl.height)))
-    ver = Label(text=f"v{APP_VERSION}", color=(0.7, 0.9, 0.75, 1), halign="left", valign="top",
-                size_hint_y=0.4, font_size="12sp")
-    ver.bind(size=lambda *_: setattr(ver, "text_size", (ver.width, ver.height)))
-    mid.add_widget(lbl)
-    mid.add_widget(ver)
-    row.add_widget(mid)
+        row.add_widget(Label(text="SOS", color=GREEN_BR, bold=True, size_hint=(None, None),
+                             size=(dp(40), dp(40))))
+    lbl = Label(text=title_text, color=TEXT, bold=True, font_size=dp(18),
+                halign="left", valign="middle", size_hint_x=1)
+    lbl.bind(size=lambda *a: setattr(lbl, "text_size", lbl.size))
+    row.add_widget(lbl)
     return row
-
 
 
 def make_unique_payload(user: str, amount: int) -> str:
@@ -640,7 +680,8 @@ def make_unique_payload(user: str, amount: int) -> str:
 def status_label(text=""):
     return Label(
         text=text, size_hint_y=None, height=28,
-        color=GREEN, bold=True, halign="left", valign="middle",
+        color=GREEN_BR, bold=True, halign="left", valign="middle",
+        font_size="14sp",
     )
 
 
@@ -649,10 +690,9 @@ def status_label(text=""):
 # =====================================================================
 class DeployTab(BoxLayout):
     def __init__(self, **kw):
-        super().__init__(orientation="vertical", padding=10, spacing=5, **kw)
+        super().__init__(orientation="vertical", padding=10, spacing=6, **kw)
 
-        self.add_widget(make_header("SOS Deployer — Deploy"))
-
+        
         self.pk       = make_input("Private key (0x...)", password=True)
         self.rpc_url  = make_input("RPC URL (mainnet)",
                                   text="https://ethereum-rpc.publicnode.com")
@@ -665,8 +705,8 @@ class DeployTab(BoxLayout):
             self.add_widget(w)
 
         row = BoxLayout(size_hint_y=0.07, spacing=6)
-        self.deploy_btn = Button(text="Deploy Contract", background_color=GREEN)
-        self.check_ledger_btn = Button(text="Check LEDGER", background_color=GRAY)
+        self.deploy_btn = Button(text="Deploy Contract", background_color=GREEN, color=TEXT)
+        self.check_ledger_btn = Button(text="Check LEDGER", background_color=INPUT_BG, color=TEXT)
         self.deploy_btn.bind(on_press=self.on_deploy)
         self.check_ledger_btn.bind(on_press=self.on_check_ledger)
         row.add_widget(self.deploy_btn)
@@ -675,7 +715,7 @@ class DeployTab(BoxLayout):
 
         self.etherscan_btn = Button(
             text="Open on Etherscan (verify source)", size_hint_y=0.07,
-            background_color=BLUE, disabled=True)
+            background_color=BLUE, color=TEXT, disabled=True)
         self.etherscan_btn.bind(on_press=self._on_etherscan)
         self.add_widget(self.etherscan_btn)
 
@@ -765,6 +805,12 @@ class DeployTab(BoxLayout):
             addr, h = deploy_contract(rpc_url, chain_id, pk, mint_fee, treasury)
             self._log(f"✅ Contract deployed: {addr}")
             self._log(f"   Tx: {h}")
+            self._log(f"   Tx link: {explorer_tx_url(chain_id, h)}")
+            self._log(f"   Contract: {explorer_url(chain_id, addr)}")
+            try:
+                open_url(explorer_tx_url(chain_id, h))
+            except Exception:
+                pass
             self._last_addr = addr
             self._last_chain = chain_id
 
@@ -801,8 +847,7 @@ class MintTab(BoxLayout):
     def __init__(self, **kw):
         super().__init__(orientation="vertical", padding=10, spacing=4, **kw)
 
-        self.add_widget(make_header("SOS cSOS — Mint"))
-
+        
         # Connection fields (can be prefilled from Deploy)
         self.rpc_url  = make_input("RPC URL",
                                   text="https://ethereum-rpc.publicnode.com")
@@ -832,13 +877,13 @@ class MintTab(BoxLayout):
 
         # Buttons
         row1 = BoxLayout(size_hint_y=0.07, spacing=6)
-        b_refresh = Button(text="Refresh Status", background_color=GRAY)
+        b_refresh = Button(text="Refresh Status", background_color=INPUT_BG, color=TEXT)
         b_refresh.bind(on_press=lambda *_: self._start("status"))
         row1.add_widget(b_refresh)
         self.add_widget(row1)
 
         row2 = BoxLayout(size_hint_y=0.08, spacing=6)
-        self.mint_btn = Button(text="Sign & Mint", background_color=GREEN)
+        self.mint_btn = Button(text="Sign & Mint", background_color=GREEN, color=TEXT)
         self.mint_btn.bind(on_press=lambda *_: self._start("mint"))
         row2.add_widget(self.mint_btn)
         self.add_widget(row2)
@@ -977,9 +1022,15 @@ class MintTab(BoxLayout):
             # note: donation is currently not attached to value; fee path still uses MINT_FEE
             tx_hash = submit_mint(rpc_url, chain_id, pk, csos, amount,
                                   payload, signature, self._mint_fee, use_max=use_max)
+            tx_link = explorer_tx_url(chain_id, tx_hash)
             self._log(f"✅ Minted {amount} cSOS")
             self._log(f"   Tx: {tx_hash}")
-            self._log(f"   {explorer_url(chain_id, csos)}")
+            self._log(f"   Tx link: {tx_link}")
+            self._log(f"   Contract: {explorer_url(chain_id, csos)}")
+            try:
+                open_url(tx_link)
+            except Exception:
+                pass
 
             self._last_payload = None
             Clock.schedule_once(lambda *_: setattr(self.payload, "text", ""))
@@ -1010,10 +1061,9 @@ class MintTab(BoxLayout):
 # =====================================================================
 class QueryTab(BoxLayout):
     def __init__(self, **kw):
-        super().__init__(orientation="vertical", padding=10, spacing=5, **kw)
+        super().__init__(orientation="vertical", padding=10, spacing=6, **kw)
 
-        self.add_widget(make_header("SOS — Query"))
-
+        
         self.rpc_url  = make_input("RPC URL",
                                   text="https://ethereum-rpc.publicnode.com")
         self.address  = make_input("Address to query (0x...)")
@@ -1023,7 +1073,7 @@ class QueryTab(BoxLayout):
             self.add_widget(w)
 
         row = BoxLayout(size_hint_y=0.07, spacing=6)
-        b = Button(text="Query", background_color=GREEN)
+        b = Button(text="Query", background_color=GREEN, color=TEXT)
         b.bind(on_press=self.on_query)
         row.add_widget(b)
         self.add_widget(row)
@@ -1070,25 +1120,46 @@ class QueryTab(BoxLayout):
 # =====================================================================
 # Root
 # =====================================================================
-class Root(TabbedPanel):
+class Root(BoxLayout):
+    """Logo header ABOVE tab strip (theme.py style). Version only on splash."""
     def __init__(self, **kw):
-        super().__init__(**kw)
-        self.do_default_tab = False
-        self.tab_width = 120
+        super().__init__(orientation="vertical", **kw)
+        self.padding = 0
+        self.spacing = 0
+
+        # Global header: logo top-left + title (no version)
+        self.add_widget(make_header("SOS Deployer"))
+
+        tabs = TabbedPanel(
+            do_default_tab=False,
+            tab_width=120,
+            tab_height=44,
+            background_color=BG,
+            border=[0, 0, 0, 0],
+            size_hint=(1, 1),
+        )
+        # dark strip
+        try:
+            tabs.background_image = ""
+        except Exception:
+            pass
 
         d = TabbedPanelItem(text="Deploy")
         d.add_widget(DeployTab())
-        self.add_widget(d)
+        tabs.add_widget(d)
 
         m = TabbedPanelItem(text="Mint")
         m.add_widget(MintTab())
-        self.add_widget(m)
+        tabs.add_widget(m)
 
         q = TabbedPanelItem(text="Query")
         q.add_widget(QueryTab())
-        self.add_widget(q)
+        tabs.add_widget(q)
 
-        self.default_tab = d
+        tabs.default_tab = d
+        self.tabs = tabs
+        self.add_widget(tabs)
+        self.tab_list = tabs.tab_list
 
 
 # =====================================================================
@@ -1136,9 +1207,10 @@ class DeployerApp(App):
         return root
 
     def switch_to_tab(self, content_widget):
-        for tab in self.root_widget.tab_list:
+        tabs = getattr(self.root_widget, "tabs", self.root_widget)
+        for tab in tabs.tab_list:
             if tab.content is content_widget:
-                self.root_widget.switch_to(tab)
+                tabs.switch_to(tab)
                 return
 
 
