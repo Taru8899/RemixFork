@@ -320,6 +320,53 @@ def _encode_bytes32(b32: str) -> str:
     return h
 
 
+def _pad32(b: bytes) -> bytes:
+    if len(b) > 32:
+        raise ValueError("word > 32 bytes")
+    return b.rjust(32, b"\x00")
+
+
+def _enc_uint256(n: int) -> bytes:
+    if n < 0:
+        n = n % (2 ** 256)
+    return int(n).to_bytes(32, "big")
+
+
+def _enc_address(addr: str) -> bytes:
+    a = addr.lower().replace("0x", "")
+    if len(a) != 40:
+        raise ValueError(f"bad address: {addr}")
+    return bytes.fromhex(a.rjust(64, "0"))
+
+
+def _enc_bytes32(val) -> bytes:
+    if isinstance(val, (bytes, bytearray)):
+        h = bytes(val)
+        if len(h) != 32:
+            raise ValueError("bytes32 must be 32 bytes")
+        return h
+    s = str(val).lower().replace("0x", "")
+    if len(s) != 64:
+        raise ValueError(f"bad bytes32: {val}")
+    return bytes.fromhex(s)
+
+
+def _enc_bytes_dynamic(data: bytes) -> bytes:
+    """ABI dynamic bytes: length + data + padding."""
+    ln = _enc_uint256(len(data))
+    pad = (32 - (len(data) % 32)) % 32
+    return ln + data + (b"\x00" * pad)
+
+
+def _enc_string(s: str) -> bytes:
+    return _enc_bytes_dynamic(s.encode("utf-8"))
+
+
+def _keccak(data: bytes) -> bytes:
+    return keccak(data)
+
+
+
 def read_uint(rpc_url, contract, sig, address_arg=None):
     data = selector(sig)
     if address_arg:
@@ -362,59 +409,49 @@ def compute_metadata(amount: int) -> str:
 
 
 def compute_struct_hash(signer, intended_to, payload_hash, metadata):
-    if payload_hash.startswith("0x"):
-        ph = bytes.fromhex(payload_hash[2:])
-    else:
-        ph = bytes.fromhex(payload_hash)
+    """EIP-712 Record struct hash — pure, no eth_abi."""
+    ph = _enc_bytes32(payload_hash)
     metadata_hash = keccak(text=metadata)
-    encoded = abi_encode(
-        ["bytes32", "address", "address", "bytes32", "bytes32"],
-        [RECORD_TYPEHASH, signer, intended_to, ph, metadata_hash],
+    encoded = (
+        _enc_bytes32(RECORD_TYPEHASH)
+        + _enc_address(signer)
+        + _enc_address(intended_to)
+        + ph
+        + _enc_bytes32(metadata_hash)
     )
     return "0x" + keccak(encoded).hex()
 
 
 def compute_domain_separator(chain_id: int, verifying_contract: str) -> str:
-    encoded = abi_encode(
-        ["bytes32", "bytes32", "bytes32", "uint256", "address"],
-        [EIP712_DOMAIN_TYPEHASH, keccak(text=DOMAIN_NAME),
-         keccak(text=DOMAIN_VERSION), int(chain_id), verifying_contract],
+    encoded = (
+        _enc_bytes32(EIP712_DOMAIN_TYPEHASH)
+        + _enc_bytes32(keccak(text=DOMAIN_NAME))
+        + _enc_bytes32(keccak(text=DOMAIN_VERSION))
+        + _enc_uint256(int(chain_id))
+        + _enc_address(verifying_contract)
     )
     return "0x" + keccak(encoded).hex()
 
 
 def sign_record(private_key, chain_id, ledger_addr,
                 signer, intended_to, payload_hash, metadata) -> str:
+    """Sign EIP-712 Record without eth_abi / encode_typed_data (Android-safe)."""
     if not payload_hash.startswith("0x"):
         payload_hash = "0x" + payload_hash
-    metadata_hash = "0x" + keccak(text=metadata).hex()
-    full_message = {
-        "types": {
-            "EIP712Domain": [
-                {"name": "name", "type": "string"},
-                {"name": "version", "type": "string"},
-                {"name": "chainId", "type": "uint256"},
-                {"name": "verifyingContract", "type": "address"},
-            ],
-            "Record": [
-                {"name": "signer", "type": "address"},
-                {"name": "intendedTo", "type": "address"},
-                {"name": "payloadHash", "type": "bytes32"},
-                {"name": "metadataHash", "type": "bytes32"},
-            ],
-        },
-        "primaryType": "Record",
-        "domain": {
-            "name": DOMAIN_NAME, "version": DOMAIN_VERSION,
-            "chainId": int(chain_id), "verifyingContract": ledger_addr,
-        },
-        "message": {
-            "signer": signer, "intendedTo": intended_to,
-            "payloadHash": payload_hash, "metadataHash": metadata_hash,
-        },
-    }
-    signed = Account.sign_message(
-        encode_typed_data(full_message=full_message), private_key=private_key)
+    struct_hash = bytes.fromhex(
+        compute_struct_hash(signer, intended_to, payload_hash, metadata)[2:]
+    )
+    domain_sep = bytes.fromhex(
+        compute_domain_separator(int(chain_id), ledger_addr)[2:]
+    )
+    # digest = keccak256("\x19\x01" || domainSeparator || structHash)
+    digest = keccak(b"\x19\x01" + domain_sep + struct_hash)
+    acct = Account.from_key(private_key)
+    # eth-account 0.10: signHash on LocalAccount (msg hash, no extra prefix)
+    if hasattr(acct, "unsafe_sign_hash"):
+        signed = acct.unsafe_sign_hash(digest)
+    else:
+        signed = acct.signHash(digest)
     sig = signed.signature.hex()
     return sig if sig.startswith("0x") else "0x" + sig
 
@@ -433,10 +470,16 @@ def check_ledger_present(rpc_url):
 
 
 def verify_struct_hash(rpc_url, user, payload, metadata) -> str:
-    call_data = selector("recordStructHash(address,address,bytes32,string)") + abi_encode(
-        ["address", "address", "bytes32", "string"],
-        [user, user, bytes.fromhex(payload[2:]), metadata],
-    ).hex()
+    # ABI: address, address, bytes32, string(dynamic)
+    # head: addr, addr, bytes32, offset(to string = 128)
+    head = (
+        _enc_address(user)
+        + _enc_address(user)
+        + _enc_bytes32(payload)
+        + _enc_uint256(128)
+    )
+    tail = _enc_string(metadata)
+    call_data = selector("recordStructHash(address,address,bytes32,string)") + (head + tail).hex()
     return decode_bytes32(eth_call(rpc_url, LEDGER_ADDR, call_data))
 
 
@@ -483,17 +526,21 @@ def submit_mint(rpc_url, chain_id, private_key, csos_addr, amount,
     nonce = int(rpc(rpc_url, "eth_getTransactionCount", [acct.address, "pending"]), 16)
     gas_price = int(rpc(rpc_url, "eth_gasPrice", []), 16)
 
+    sig_bytes = bytes.fromhex(signature[2:] if signature.startswith("0x") else signature)
+    ph_bytes = _enc_bytes32(payload_hash)
+
     if use_max:
+        # mintMax(bytes32,bytes) — head: bytes32, offset(64); tail: dynamic bytes
         sig_name = "mintMax(bytes32,bytes)"
-        encoded = abi_encode(
-            ["bytes32", "bytes"],
-            [bytes.fromhex(payload_hash[2:]), bytes.fromhex(signature[2:])])
+        head = ph_bytes + _enc_uint256(64)
+        tail = _enc_bytes_dynamic(sig_bytes)
+        encoded = head + tail
     else:
+        # mint(uint256,bytes32,bytes) — head: uint, bytes32, offset(96); tail: bytes
         sig_name = "mint(uint256,bytes32,bytes)"
-        encoded = abi_encode(
-            ["uint256", "bytes32", "bytes"],
-            [int(amount), bytes.fromhex(payload_hash[2:]),
-             bytes.fromhex(signature[2:])])
+        head = _enc_uint256(int(amount)) + ph_bytes + _enc_uint256(96)
+        tail = _enc_bytes_dynamic(sig_bytes)
+        encoded = head + tail
 
     data = selector(sig_name) + encoded.hex()
     value = int(amount) * int(mint_fee)
@@ -578,12 +625,14 @@ def make_header(title_text):
 
 
 def make_unique_payload(user: str, amount: int) -> str:
-    """Generate a unique payloadHash so the user never has to type one."""
+    """Generate a unique payloadHash — pure Python, no eth_abi."""
     import os, time
     rand = os.urandom(32)
-    raw = abi_encode(
-        ["address", "uint256", "bytes32", "uint256"],
-        [user, int(amount), rand, int(time.time())],
+    raw = (
+        _enc_address(user)
+        + _enc_uint256(int(amount))
+        + _enc_bytes32(rand)
+        + _enc_uint256(int(time.time()))
     )
     return "0x" + keccak(raw).hex()
 

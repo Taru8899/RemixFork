@@ -36,8 +36,7 @@ The app automatically:
 ## Contracts
 
 - LEDGER (immutable): `0x7373DBC24Dcd785896E8Ac3d5372c6ced9B75a8A`
-- cSOS:0xce9B507C242Adf722DD1DE2d7aa5Db1BF2259D8F
-- the address returned by Deploy (or the one you already deployed)
+- cSOS: the address returned by Deploy (or the one you already deployed)
 
 ## Build APK
 
