@@ -26,7 +26,7 @@ from kivy.uix.textinput import TextInput
 # Android logcat helper (works even if android libs are missing)
 # =====================================================================
 LOG_TAG = "SOSDEPLOYER"
-APP_VERSION = "0.3"
+APP_VERSION = "0.4"
 
 # Early theme constants (must exist before make_button/make_input run)
 try:
@@ -613,59 +613,109 @@ def submit_mint(rpc_url, chain_id, private_key, csos_addr, amount,
 # =====================================================================
 # UI helpers
 # =====================================================================
-def make_button(label, bg=None, height=64):
+BTN_H   = dp(56)     # touch-friendly button height
+INPUT_H = dp(56)     # input field height
+PAD_X   = dp(14)     # horizontal text padding inside inputs
+
+
+def make_button(label, bg=None, height=None):
     """Large touch target — easy to hit with a finger."""
-    btn = Button(
+    return Button(
         text=label,
         size_hint_y=None,
-        height=height,
+        height=height or BTN_H,
         background_normal="",
         background_down="",
         background_color=bg if bg is not None else GREEN,
         color=TEXT,
         bold=True,
-        font_size="18sp",
+        font_size="17sp",
     )
-    return btn
 
 
-def make_input(hint, password=False, numeric=False, height=0.055, text=""):
-    # Field taller than text; do NOT pass bold= (TextInput has no bold property → crash)
-    h = 68
-    return TextInput(
-        hint_text=hint, password=password, multiline=False,
+def make_input(hint, password=False, numeric=False, text=""):
+    """Single-line input with the text vertically CENTERED.
+
+    Kivy's TextInput draws text from the top padding down, so a fixed
+    padding leaves the text hugging the bottom (or clipped) on high-DPI
+    phones. We compute the vertical padding from the real line height and
+    re-apply it whenever the size or font changes.
+    NOTE: do NOT pass bold= (TextInput has no bold property crash).
+    """
+    ti = TextInput(
+        hint_text=hint,
+        password=password,
+        multiline=False,
         input_filter="int" if numeric else None,
         size_hint_y=None,
-        height=h,
+        height=INPUT_H,
         text=text,
         background_normal="",
         background_active="",
         background_color=INPUT_BG,
         foreground_color=TEXT,
         cursor_color=BLUE_SOFT,
-        padding=[18, 20, 18, 20],
-        font_size="18sp",
+        cursor_width=dp(2),
+        font_size="17sp",
         write_tab=False,
         hint_text_color=TEXT_MUTED,
         halign="left",
+        padding=[PAD_X, dp(12), PAD_X, dp(12)],
     )
+    if numeric:
+        ti.input_type = "number"
+
+    def _center(*_):
+        pad_y = max(0.0, (ti.height - ti.line_height) / 2.0)
+        ti.padding = [PAD_X, pad_y, PAD_X, pad_y]
+
+    ti.bind(height=_center, line_height=_center, font_size=_center)
+    Clock.schedule_once(_center, 0)
+    return ti
+
+
+def make_caption(text):
+    """Small label shown above an input (hints vanish once you type)."""
+    lbl = Label(
+        text=text, size_hint_y=None, height=dp(22),
+        color=TEXT_SEC, font_size="13sp", halign="left", valign="bottom",
+    )
+    lbl.bind(size=lambda *_: setattr(lbl, "text_size", lbl.size))
+    return lbl
 
 
 def make_log_area(initial=""):
-    sv = ScrollView(bar_width=0, do_scroll_x=False)
+    """Log label that lives INSIDE the tab's scrolling form (no nested scroll)."""
     lbl = Label(text=initial, size_hint_y=None, halign="left", valign="top",
-                color=TEXT_SEC, font_size="15sp")
-    lbl.bind(width=lambda *_: setattr(lbl, "text_size", (lbl.width, None)))
-    lbl.bind(texture_size=lambda *_: setattr(lbl, "height", lbl.texture_size[1]))
-    sv.add_widget(lbl)
-    return sv, lbl
+                color=TEXT_SEC, font_size="14sp", padding=(dp(10), dp(10)))
+    def _resize(*_):
+        lbl.text_size = (lbl.width - dp(20), None)
+        lbl.height = max(dp(180), lbl.texture_size[1] + dp(20))
+    lbl.bind(width=_resize, texture_size=_resize)
+    with lbl.canvas.before:
+        from kivy.graphics import Color, Rectangle
+        Color(*CARD_BG)
+        rect = Rectangle(pos=lbl.pos, size=lbl.size)
+    lbl.bind(pos=lambda *_: setattr(rect, "pos", lbl.pos),
+             size=lambda *_: setattr(rect, "size", lbl.size))
+    return lbl, lbl
+
+
+def _scroll_to_bottom(label):
+    p = label.parent
+    while p is not None and not isinstance(p, ScrollView):
+        p = p.parent
+    if p is not None:
+        p.scroll_y = 0
 
 
 def log_to(label):
     def _log(msg):
-        Clock.schedule_once(lambda *_: setattr(label, "text", label.text + msg + "\n"))
+        def _do(*_):
+            label.text += msg + "\n"
+            Clock.schedule_once(lambda *_: _scroll_to_bottom(label), 0.05)
+        Clock.schedule_once(_do)
     return _log
-
 
 
 # =====================================================================
@@ -690,6 +740,7 @@ WHITE       = TEXT
 
 try:
     Window.clearcolor = BG
+    Window.softinput_mode = "below_target"   # keyboard pushes the focused field into view
 except Exception:
     pass
 
@@ -727,19 +778,42 @@ def make_unique_payload(user: str, amount: int) -> str:
 
 
 def status_label(text=""):
-    return Label(
-        text=text, size_hint_y=None, height=42,
+    lbl = Label(
+        text=text, size_hint_y=None, height=dp(40),
         color=GREEN_BR, bold=True, halign="left", valign="middle",
-        font_size="17sp",
+        font_size="15sp",
     )
+    lbl.bind(size=lambda *_: setattr(lbl, "text_size", lbl.size))
+    return lbl
+
+
+class FormTab(ScrollView):
+    """Scrollable form: every tab scrolls, so nothing is squeezed off-screen
+    on small phones or when the keyboard is open."""
+    def __init__(self, **kw):
+        super().__init__(do_scroll_x=False, bar_width=dp(3), **kw)
+        self.form = BoxLayout(orientation="vertical", size_hint_y=None,
+                              padding=[dp(14), dp(8), dp(14), dp(24)],
+                              spacing=dp(6))
+        self.form.bind(minimum_height=self.form.setter("height"))
+        super().add_widget(self.form)
+
+    def field(self, caption, widget):
+        self.form.add_widget(make_caption(caption))
+        self.form.add_widget(widget)
+        return widget
+
+    def gap(self, h=8):
+        from kivy.uix.widget import Widget
+        self.form.add_widget(Widget(size_hint_y=None, height=dp(h)))
 
 
 # =====================================================================
 # Deploy tab  (kept almost identical, only green accents + logo)
 # =====================================================================
-class DeployTab(BoxLayout):
+class DeployTab(FormTab):
     def __init__(self, **kw):
-        super().__init__(orientation="vertical", padding=12, spacing=10, **kw)
+        super().__init__(**kw)
 
         
         self.pk       = make_input("Private key (0x...)", password=True)
@@ -750,30 +824,35 @@ class DeployTab(BoxLayout):
         self.mint_fee = make_input("MINT_FEE in wei (recommend 0)", numeric=True, text="0")
         self.treasury = make_input("TREASURY address (0x...)",
                                    text="0x1C10e6574ee696f54b21A611a21313E4714628ad")
-        for w in (self.pk, self.rpc_url, self.chain_id, self.mint_fee, self.treasury):
-            self.add_widget(w)
+        self.form.clear_widgets()
+        self.field("Private key", self.pk)
+        self.field("RPC URL", self.rpc_url)
+        self.field("Chain ID", self.chain_id)
+        self.field("Mint fee (wei)", self.mint_fee)
+        self.field("Treasury address", self.treasury)
+        self.gap()
 
-        row = BoxLayout(size_hint_y=None, height=64, spacing=10)
+        row = BoxLayout(size_hint_y=None, height=BTN_H, spacing=dp(10))
         self.deploy_btn = make_button("Deploy Contract", GREEN)
         self.check_ledger_btn = make_button("Check LEDGER", INPUT_BG)
         self.deploy_btn.bind(on_press=self.on_deploy)
         self.check_ledger_btn.bind(on_press=self.on_check_ledger)
         row.add_widget(self.deploy_btn)
         row.add_widget(self.check_ledger_btn)
-        self.add_widget(row)
+        self.form.add_widget(row)
 
         self.etherscan_btn = make_button("Open on Etherscan (verify source)", BLUE)
         self.etherscan_btn.disabled = True
         self.etherscan_btn.bind(on_press=self._on_etherscan)
-        self.add_widget(self.etherscan_btn)
+        self.form.add_widget(self.etherscan_btn)
 
-        self.mint_tab_btn = make_button("→ Go to Mint tab (prefilled)", GREEN)
+        self.mint_tab_btn = make_button("Go to Mint tab (prefilled)", GREEN)
         self.mint_tab_btn.disabled = True
         self.mint_tab_btn.bind(on_press=self._on_goto_mint)
-        self.add_widget(self.mint_tab_btn)
+        self.form.add_widget(self.mint_tab_btn)
 
         sv, self.log = make_log_area("Ready. Test on Sepolia first!\n")
-        self.add_widget(sv)
+        self.form.add_widget(sv)
         self._log = log_to(self.log)
         self._last_addr = None
         self._last_chain = None
@@ -797,15 +876,15 @@ class DeployTab(BoxLayout):
     def on_check_ledger(self, *_):
         rpc_url = self.rpc_url.text.strip()
         if not rpc_url:
-            self._log("❌ Enter RPC URL first.")
+            self._log("[X] Enter RPC URL first.")
             return
-        self._log(f"→ Checking LEDGER at {LEDGER_ADDR} …")
+        self._log(f"Checking LEDGER at {LEDGER_ADDR} …")
         threading.Thread(target=self._check_worker, args=(rpc_url,), daemon=True).start()
 
     def _check_worker(self, rpc_url):
         try:
             size = check_ledger_present(rpc_url)
-            self._log(f"✅ LEDGER present ({size} bytes of code)")
+            self._log(f"[OK] LEDGER present ({size} bytes of code)")
             onchain_ds = decode_bytes32(eth_call(
                 rpc_url, LEDGER_ADDR, selector("domainSeparator()")))
             chain_id = int(self.chain_id.text.strip() or "1")
@@ -813,11 +892,11 @@ class DeployTab(BoxLayout):
             self._log(f"   on-chain domainSeparator = {onchain_ds}")
             self._log(f"   local domainSeparator    = {local_ds}")
             if onchain_ds.lower() == local_ds.lower():
-                self._log("   ✅ domain separators match")
+                self._log("   [OK] domain separators match")
             else:
-                self._log("   ⚠️  domain separators differ — check chain ID")
+                self._log("   [!]  domain separators differ — check chain ID")
         except Exception as e:
-            self._log(f"❌ {e}")
+            self._log(f"[X] {e}")
 
     def on_deploy(self, *_):
         pk = self.pk.text.strip()
@@ -826,15 +905,15 @@ class DeployTab(BoxLayout):
         mint_fee = self.mint_fee.text.strip() or "0"
         treasury = self.treasury.text.strip()
         if not all([pk, rpc_url, chain_id, treasury]):
-            self._log("❌ Fill in all fields.")
+            self._log("[X] Fill in all fields.")
             return
         if chain_id == "1":
-            self._log("⚠️  MAINNET — make sure you tested on Sepolia first.")
+            self._log("[!]  MAINNET — make sure you tested on Sepolia first.")
 
         self.deploy_btn.disabled = True
         self.etherscan_btn.disabled = True
         self.mint_tab_btn.disabled = True
-        self._log(f"→ Deploying to chain {chain_id} …")
+        self._log(f"Deploying to chain {chain_id} …")
         threading.Thread(
             target=self._worker,
             args=(rpc_url, chain_id, pk, mint_fee, treasury),
@@ -844,13 +923,13 @@ class DeployTab(BoxLayout):
         try:
             try:
                 check_ledger_present(rpc_url)
-                self._log("✅ LEDGER present on chain")
+                self._log("[OK] LEDGER present on chain")
             except Exception as e:
-                self._log(f"❌ Pre-flight failed: {e}")
+                self._log(f"[X] Pre-flight failed: {e}")
                 return
 
             addr, h = deploy_contract(rpc_url, chain_id, pk, mint_fee, treasury)
-            self._log(f"✅ Contract deployed: {addr}")
+            self._log(f"[OK] Contract deployed: {addr}")
             self._log(f"   Tx: {h}")
             self._log(f"   Tx link: {explorer_tx_url(chain_id, h)}")
             self._log(f"   Contract: {explorer_url(chain_id, addr)}")
@@ -872,17 +951,17 @@ class DeployTab(BoxLayout):
                 self._log(f"   TREASURY = {got_t}")
                 self._log(f"   MINT_FEE = {got_f}")
                 if got_t.lower() != treasury.lower():
-                    self._log("   ⚠️  TREASURY mismatch!")
+                    self._log("   [!]  TREASURY mismatch!")
                 if got_f != int(mint_fee):
-                    self._log("   ⚠️  MINT_FEE mismatch!")
+                    self._log("   [!]  MINT_FEE mismatch!")
             except Exception as e:
                 self._log(f"   (read-back failed: {e})")
 
             Clock.schedule_once(lambda *_: setattr(self.etherscan_btn, "disabled", False))
             Clock.schedule_once(lambda *_: setattr(self.mint_tab_btn, "disabled", False))
-            self._log("→ Verify on Etherscan, or tap the green button to mint.")
+            self._log("Verify on Etherscan, or tap the green button to mint.")
         except Exception as e:
-            self._log(f"❌ Deployment failed:\n{e}")
+            self._log(f"[X] Deployment failed:\n{e}")
         finally:
             Clock.schedule_once(lambda *_: setattr(self.deploy_btn, "disabled", False))
 
@@ -890,9 +969,9 @@ class DeployTab(BoxLayout):
 # =====================================================================
 # Mint tab  — simplified, minimal user input
 # =====================================================================
-class MintTab(BoxLayout):
+class MintTab(FormTab):
     def __init__(self, **kw):
-        super().__init__(orientation="vertical", padding=12, spacing=10, **kw)
+        super().__init__(**kw)
 
         
         # Connection fields (can be prefilled from Deploy)
@@ -902,38 +981,43 @@ class MintTab(BoxLayout):
         self.pk       = make_input("Private key (signer = minter)", password=True)
         self.contract = make_input("cSOS contract address (0x...)",
                                    text="0xce9B507C242Adf722DD1DE2d7aa5Db1BF2259D8F")
-        for w in (self.rpc_url, self.chain_id, self.pk, self.contract):
-            self.add_widget(w)
+        self.form.clear_widgets()
+        self.field("RPC URL", self.rpc_url)
+        self.field("Chain ID", self.chain_id)
+        self.field("Private key (signer = minter)", self.pk)
+        self.field("cSOS contract address", self.contract)
 
         # Live status
+        self.gap(4)
         self.status = status_label("Connect & tap Refresh Status")
-        self.add_widget(self.status)
+        self.form.add_widget(self.status)
 
         # Amount — the only number the user normally cares about
-        self.amount = make_input("Amount to mint (leave blank = Mint Max)")
-        self.add_widget(self.amount)
+        self.amount = make_input("Leave blank = Mint Max", numeric=True)
+        self.field("Amount to mint", self.amount)
 
         # Optional donation
         self.donation = make_input("Optional donation in wei (0 = none)", numeric=True)
         self.donation.text = "0"
-        self.add_widget(self.donation)
+        self.field("Optional donation (wei)", self.donation)
 
         # Advanced (collapsed by default – payload only shown for power users)
-        self.payload = make_input("payloadHash (leave blank = auto-generate)")
-        self.add_widget(self.payload)
+        self.payload = make_input("Leave blank = auto-generate")
+        self.field("payloadHash (advanced)", self.payload)
+        self.gap()
 
         # Buttons
-        row1 = BoxLayout(size_hint_y=None, height=64, spacing=10)
+        row1 = BoxLayout(size_hint_y=None, height=BTN_H, spacing=dp(10))
         b_refresh = make_button("Refresh Status", INPUT_BG)
         b_refresh.bind(on_press=lambda *_: self._start("status"))
         row1.add_widget(b_refresh)
-        self.add_widget(row1)
+        self.form.add_widget(row1)
 
-        row2 = BoxLayout(size_hint_y=None, height=64, spacing=10)
-        self.mint_btn = make_button("Sign & Mint", GREEN, height=68)
+        row2 = BoxLayout(size_hint_y=None, height=BTN_H, spacing=dp(10))
+        self.mint_btn = make_button("Sign & Mint", GREEN, height=dp(62))
         self.mint_btn.bind(on_press=lambda *_: self._start("mint"))
         row2.add_widget(self.mint_btn)
-        self.add_widget(row2)
+        self.form.add_widget(row2)
 
         # Log
         sv, self.log = make_log_area(
@@ -941,7 +1025,7 @@ class MintTab(BoxLayout):
             "2. Tap Refresh Status\n"
             "3. Enter amount (or leave blank for max)\n"
             "4. Tap Sign & Mint — payloadHash is generated automatically\n")
-        self.add_widget(sv)
+        self.form.add_widget(sv)
         self._log = log_to(self.log)
 
         self._mint_fee = 0
@@ -964,7 +1048,7 @@ class MintTab(BoxLayout):
         pk = self.pk.text.strip()
         csos = self.contract.text.strip()
         if not all([rpc_url, chain_id, pk, csos]):
-            self._log("❌ Fill RPC, Chain ID, Private key and cSOS address.")
+            self._log("[X] Fill RPC, Chain ID, Private key and cSOS address.")
             return
         self.mint_btn.disabled = True
         threading.Thread(
@@ -976,7 +1060,7 @@ class MintTab(BoxLayout):
         try:
             acct = Account.from_key(pk)
             user = acct.address
-            self._log(f"→ User = {user}")
+            self._log(f"User = {user}")
 
             # Always fetch live status
             try:
@@ -986,13 +1070,13 @@ class MintTab(BoxLayout):
                 Clock.schedule_once(lambda *_: setattr(self.status, "text", status_txt))
                 self._log(f"   {status_txt}")
             except Exception as e:
-                self._log(f"⚠️  status read failed: {e}")
+                self._log(f"[!]  status read failed: {e}")
                 if mode == "status":
                     return
                 eff = minted = mintable = 0
 
             if mode == "status":
-                self._log("✅ Status updated.")
+                self._log("[OK] Status updated.")
                 return
 
             # ---- prepare amount ----
@@ -1000,28 +1084,28 @@ class MintTab(BoxLayout):
             if amount_txt == "":
                 amount = mintable
                 if amount == 0:
-                    self._log("❌ Nothing mintable (need effective > 10 and remaining capacity).")
+                    self._log("[X] Nothing mintable (need effective > 10 and remaining capacity).")
                     return
-                self._log(f"→ MintMax selected → amount = {amount}")
+                self._log(f"MintMax selected amount = {amount}")
             else:
                 amount = int(amount_txt)
                 if amount <= 0:
-                    self._log("❌ Amount must be > 0")
+                    self._log("[X] Amount must be > 0")
                     return
                 if amount > mintable:
-                    self._log(f"❌ Requested {amount} but only {mintable} mintable.")
+                    self._log(f"[X] Requested {amount} but only {mintable} mintable.")
                     return
 
             # ---- payloadHash (auto if blank) ----
             payload = self.payload.text.strip()
             if not payload:
                 payload = make_unique_payload(user, amount)
-                self._log(f"→ Auto payloadHash = {payload[:18]}…")
+                self._log(f"Auto payloadHash = {payload[:18]}…")
                 Clock.schedule_once(lambda *_: setattr(self.payload, "text", payload))
             else:
                 if not payload.startswith("0x"):
                     payload = "0x" + payload
-                self._log(f"→ Using provided payloadHash = {payload[:18]}…")
+                self._log(f"Using provided payloadHash = {payload[:18]}…")
 
             metadata = compute_metadata(amount)
             self._log(f"   metadata = {metadata}")
@@ -1034,43 +1118,43 @@ class MintTab(BoxLayout):
             try:
                 onchain_sh = verify_struct_hash(rpc_url, user, payload, metadata)
                 if onchain_sh.lower() != local_sh.lower():
-                    self._log("❌ structHash mismatch with LEDGER — aborting.")
+                    self._log("[X] structHash mismatch with LEDGER — aborting.")
                     return
-                self._log("   ✅ hashes match")
+                self._log("   [OK] hashes match")
             except Exception as e:
-                self._log(f"   ⚠️  on-chain structHash call failed: {e}")
+                self._log(f"   [!]  on-chain structHash call failed: {e}")
 
             try:
                 used_ledger = read_bool(rpc_url, LEDGER_ADDR,
                                         "isRecordHashUsed(bytes32)", local_sh)
                 if used_ledger:
-                    self._log("❌ This exact record already exists on LEDGER.")
+                    self._log("[X] This exact record already exists on LEDGER.")
                     return
             except Exception as e:
-                self._log(f"   ⚠️  isRecordHashUsed check failed: {e}")
+                self._log(f"   [!]  isRecordHashUsed check failed: {e}")
 
             try:
                 used_csos = read_bool(rpc_url, csos, "usedMintHash(bytes32)", local_sh)
                 if used_csos:
-                    self._log("❌ This mint hash is already used on cSOS.")
+                    self._log("[X] This mint hash is already used on cSOS.")
                     return
             except Exception as e:
-                self._log(f"   ⚠️  usedMintHash check failed: {e}")
+                self._log(f"   [!]  usedMintHash check failed: {e}")
 
             # ---- sign ----
-            self._log("→ Signing EIP-712 Record …")
+            self._log("Signing EIP-712 Record …")
             signature = sign_record(pk, chain_id, LEDGER_ADDR,
                                     user, user, payload, metadata)
             self._log(f"   signature = {signature[:20]}…")
 
             # ---- submit ----
             use_max = (self.amount.text.strip() == "")
-            self._log(f"→ Submitting {'mintMax' if use_max else 'mint'} …")
+            self._log(f"Submitting {'mintMax' if use_max else 'mint'} …")
             # note: donation is currently not attached to value; fee path still uses MINT_FEE
             tx_hash = submit_mint(rpc_url, chain_id, pk, csos, amount,
                                   payload, signature, self._mint_fee, use_max=use_max)
             tx_link = explorer_tx_url(chain_id, tx_hash)
-            self._log(f"✅ Minted {amount} cSOS")
+            self._log(f"[OK] Minted {amount} cSOS")
             self._log(f"   Tx: {tx_hash}")
             self._log(f"   Tx link: {tx_link}")
             self._log(f"   Contract: {explorer_url(chain_id, csos)}")
@@ -1098,7 +1182,7 @@ class MintTab(BoxLayout):
                 pass
 
         except Exception as e:
-            self._log(f"❌ {e}\n{traceback.format_exc()}")
+            self._log(f"[X] {e}\n{traceback.format_exc()}")
         finally:
             Clock.schedule_once(lambda *_: setattr(self.mint_btn, "disabled", False))
 
@@ -1106,9 +1190,9 @@ class MintTab(BoxLayout):
 # =====================================================================
 # Query tab (simple read-only helper)
 # =====================================================================
-class QueryTab(BoxLayout):
+class QueryTab(FormTab):
     def __init__(self, **kw):
-        super().__init__(orientation="vertical", padding=12, spacing=10, **kw)
+        super().__init__(**kw)
 
         
         self.rpc_url  = make_input("RPC URL",
@@ -1116,17 +1200,20 @@ class QueryTab(BoxLayout):
         self.address  = make_input("Address to query (0x...)")
         self.csos     = make_input("cSOS contract (optional)",
                                    text="0xce9B507C242Adf722DD1DE2d7aa5Db1BF2259D8F")
-        for w in (self.rpc_url, self.address, self.csos):
-            self.add_widget(w)
+        self.form.clear_widgets()
+        self.field("RPC URL", self.rpc_url)
+        self.field("Address to query", self.address)
+        self.field("cSOS contract (optional)", self.csos)
+        self.gap()
 
-        row = BoxLayout(size_hint_y=None, height=64, spacing=10)
+        row = BoxLayout(size_hint_y=None, height=BTN_H, spacing=dp(10))
         b = make_button("Query", GREEN)
         b.bind(on_press=self.on_query)
         row.add_widget(b)
-        self.add_widget(row)
+        self.form.add_widget(row)
 
         sv, self.log = make_log_area("Enter an address and tap Query.\n")
-        self.add_widget(sv)
+        self.form.add_widget(sv)
         self._log = log_to(self.log)
 
     def on_query(self, *_):
@@ -1134,13 +1221,13 @@ class QueryTab(BoxLayout):
         addr = self.address.text.strip()
         csos = self.csos.text.strip()
         if not rpc_url or not addr:
-            self._log("❌ RPC + address required.")
+            self._log("[X] RPC + address required.")
             return
         threading.Thread(target=self._worker, args=(rpc_url, addr, csos), daemon=True).start()
 
     def _worker(self, rpc_url, addr, csos):
         try:
-            self._log(f"→ Query {addr}")
+            self._log(f"Query {addr}")
             push = read_uint(rpc_url, LEDGER_ADDR, "pushCountOf(address)", addr)
             trust = read_uint(rpc_url, LEDGER_ADDR, "trustCountOf(address)", addr)
             eff = read_int(rpc_url, LEDGER_ADDR, "effectiveOf(address)", addr)
@@ -1159,9 +1246,9 @@ class QueryTab(BoxLayout):
                     self._log(f"   cSOS mintable = {mintable}")
                 except Exception as e:
                     self._log(f"   cSOS read error: {e}")
-            self._log("✅ done")
+            self._log("[OK] done")
         except Exception as e:
-            self._log(f"❌ {e}")
+            self._log(f"[X] {e}")
 
 
 # =====================================================================
@@ -1179,8 +1266,8 @@ class Root(BoxLayout):
 
         tabs = TabbedPanel(
             do_default_tab=False,
-            tab_width=140,
-            tab_height=60,
+            tab_width=dp(110),
+            tab_height=dp(48),
             size_hint=(1, 1),
         )
         try:
