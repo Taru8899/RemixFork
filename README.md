@@ -36,8 +36,7 @@ The app automatically:
 ## Contracts
 
 - LEDGER (immutable): `0x7373DBC24Dcd785896E8Ac3d5372c6ced9B75a8A`
-- cSOS:0xce9B507C242Adf722DD1DE2d7aa5Db1BF2259D8F
-- the address returned by Deploy (or the one you already deployed)
+- cSOS: the address returned by Deploy (or the one you already deployed)
 
 ## Build APK
 
@@ -59,3 +58,24 @@ Requires the usual Buildozer / Android SDK / NDK setup.
 This is a **power-user / deployer tool**. It uses a raw private key.
 Do **not** use it as a public-facing wallet. For end users, build a proper
 wallet-connected web dApp that never sees the private key.
+
+## Prefill defaults (editable)
+
+On open the app already fills safe public values. You can edit or paste over any of them.
+
+| Field | Default |
+|-------|---------|
+| RPC URL | https://ethereum-sepolia-rpc.publicnode.com |
+| Chain ID | 11155111 (Sepolia) |
+| MINT_FEE | 0 |
+| TREASURY | 0x1C10e6574ee696f54b21A611a21313E4714628ad |
+| cSOS contract | 0xce9B507C242Adf722DD1DE2d7aa5Db1BF2259D8F |
+| Donation | 0 |
+
+Never prefilled: private key, amount, payloadHash, query address.
+
+## Branding
+
+- **App icon** (launcher): `icon.png` — SOS green star logo
+- **Startup splash**: `presplash.png` — logo + SOS Deployer + **v0.3**
+- In-app header: logo top-left + title + version on every tab

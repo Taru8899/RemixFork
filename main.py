@@ -23,6 +23,7 @@ from kivy.uix.textinput import TextInput
 # Android logcat helper (works even if android libs are missing)
 # =====================================================================
 LOG_TAG = "SOSDEPLOYER"
+APP_VERSION = "0.3"
 
 def _alog(msg):
     try:
@@ -542,7 +543,7 @@ WHITE       = (1, 1, 1, 1)
 
 
 def make_header(title_text):
-    """Logo top-left + title — same style on every page."""
+    """Logo top-left + title + version — same style on every page."""
     from kivy.uix.image import Image
     from kivy.uix.boxlayout import BoxLayout
     from kivy.uix.label import Label
@@ -553,10 +554,16 @@ def make_header(title_text):
         row.add_widget(logo)
     except Exception:
         pass
-    lbl = Label(text=title_text, bold=True, color=GREEN, halign="left", valign="middle",
-                size_hint_x=1)
+    mid = BoxLayout(orientation="vertical", size_hint_x=1)
+    lbl = Label(text=title_text, bold=True, color=GREEN, halign="left", valign="bottom",
+                size_hint_y=0.6)
     lbl.bind(size=lambda *_: setattr(lbl, "text_size", (lbl.width, lbl.height)))
-    row.add_widget(lbl)
+    ver = Label(text=f"v{APP_VERSION}", color=(0.7, 0.9, 0.75, 1), halign="left", valign="top",
+                size_hint_y=0.4, font_size="12sp")
+    ver.bind(size=lambda *_: setattr(ver, "text_size", (ver.width, ver.height)))
+    mid.add_widget(lbl)
+    mid.add_widget(ver)
+    row.add_widget(mid)
     return row
 
 
@@ -589,15 +596,15 @@ class DeployTab(BoxLayout):
         self.add_widget(make_header("SOS Deployer — Deploy"))
 
         self.pk       = make_input("Private key (0x...)", password=True)
-        self.rpc_url  = make_input("RPC URL (e.g. https://sepolia.infura.io/v3/KEY)")
-        self.chain_id = make_input("Chain ID (1=mainnet, 11155111=Sepolia)", numeric=True)
-        self.mint_fee = make_input("MINT_FEE in wei (recommend 0)", numeric=True)
-        self.treasury = make_input("TREASURY address (0x...)")
+        self.rpc_url  = make_input("RPC URL (e.g. https://sepolia.infura.io/v3/KEY)",
+                                  text="https://ethereum-sepolia-rpc.publicnode.com")
+        self.chain_id = make_input("Chain ID (1=mainnet, 11155111=Sepolia)", numeric=True,
+                                   text="11155111")
+        self.mint_fee = make_input("MINT_FEE in wei (recommend 0)", numeric=True, text="0")
+        self.treasury = make_input("TREASURY address (0x...)",
+                                   text="0x1C10e6574ee696f54b21A611a21313E4714628ad")
         for w in (self.pk, self.rpc_url, self.chain_id, self.mint_fee, self.treasury):
             self.add_widget(w)
-
-        self.chain_id.text = "11155111"
-        self.mint_fee.text = "0"
 
         row = BoxLayout(size_hint_y=0.07, spacing=6)
         self.deploy_btn = Button(text="Deploy Contract", background_color=GREEN)
@@ -739,10 +746,12 @@ class MintTab(BoxLayout):
         self.add_widget(make_header("SOS cSOS — Mint"))
 
         # Connection fields (can be prefilled from Deploy)
-        self.rpc_url  = make_input("RPC URL")
-        self.chain_id = make_input("Chain ID", numeric=True)
+        self.rpc_url  = make_input("RPC URL",
+                                  text="https://ethereum-sepolia-rpc.publicnode.com")
+        self.chain_id = make_input("Chain ID", numeric=True, text="11155111")
         self.pk       = make_input("Private key (signer = minter)", password=True)
-        self.contract = make_input("cSOS contract address (0x...)")
+        self.contract = make_input("cSOS contract address (0x...)",
+                                   text="0xce9B507C242Adf722DD1DE2d7aa5Db1BF2259D8F")
         for w in (self.rpc_url, self.chain_id, self.pk, self.contract):
             self.add_widget(w)
 
@@ -947,9 +956,11 @@ class QueryTab(BoxLayout):
 
         self.add_widget(make_header("SOS — Query"))
 
-        self.rpc_url  = make_input("RPC URL")
+        self.rpc_url  = make_input("RPC URL",
+                                  text="https://ethereum-sepolia-rpc.publicnode.com")
         self.address  = make_input("Address to query (0x...)")
-        self.csos     = make_input("cSOS contract (optional)")
+        self.csos     = make_input("cSOS contract (optional)",
+                                   text="0xce9B507C242Adf722DD1DE2d7aa5Db1BF2259D8F")
         for w in (self.rpc_url, self.address, self.csos):
             self.add_widget(w)
 
@@ -1046,6 +1057,7 @@ class ImportErrorScreen(BoxLayout):
 # App
 # =====================================================================
 class DeployerApp(App):
+    title = f"SOS Deployer v{APP_VERSION}"
     last_deployed = None
     last_chain = None
     last_rpc = None
