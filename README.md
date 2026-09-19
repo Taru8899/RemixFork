@@ -65,8 +65,8 @@ On open the app already fills safe public values. You can edit or paste over any
 
 | Field | Default |
 |-------|---------|
-| RPC URL | https://ethereum-sepolia-rpc.publicnode.com |
-| Chain ID | 11155111 (Sepolia) |
+| RPC URL | https://ethereum-rpc.publicnode.com |
+| Chain ID | 1 (Ethereum mainnet) |
 | MINT_FEE | 0 |
 | TREASURY | 0x1C10e6574ee696f54b21A611a21313E4714628ad |
 | cSOS contract | 0xce9B507C242Adf722DD1DE2d7aa5Db1BF2259D8F |
@@ -79,3 +79,10 @@ Never prefilled: private key, amount, payloadHash, query address.
 - **App icon** (launcher): `icon.png` — SOS green star logo
 - **Startup splash**: `presplash.png` — logo + SOS Deployer + **v0.3**
 - In-app header: logo top-left + title + version on every tab
+
+
+## Fix notes (v0.3.1)
+
+- Status read no longer crashes (`fetch_mint_status` returns a proper tuple; address ABI encoding is manual to avoid Android eth_abi `isinstance` bugs).
+- Defaults are **Ethereum mainnet** (chain id 1 + public mainnet RPC).
+- Logo corners cleaned (black → transparent).

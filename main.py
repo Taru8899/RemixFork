@@ -305,22 +305,37 @@ def decode_string(h):
     return b[off + 32:off + 32 + ln].decode("utf-8", errors="replace")
 
 
+def _encode_address(addr: str) -> str:
+    """Manual ABI word for address — avoids eth_abi isinstance issues on Android."""
+    a = addr.lower().replace("0x", "")
+    if len(a) != 40:
+        raise ValueError(f"bad address: {addr}")
+    return a.rjust(64, "0")
+
+
+def _encode_bytes32(b32: str) -> str:
+    h = b32.lower().replace("0x", "")
+    if len(h) != 64:
+        raise ValueError(f"bad bytes32: {b32}")
+    return h
+
+
 def read_uint(rpc_url, contract, sig, address_arg=None):
     data = selector(sig)
     if address_arg:
-        data += abi_encode(["address"], [address_arg]).hex()
+        data += _encode_address(address_arg)
     return decode_uint(eth_call(rpc_url, contract, data))
 
 
 def read_int(rpc_url, contract, sig, address_arg=None):
     data = selector(sig)
     if address_arg:
-        data += abi_encode(["address"], [address_arg]).hex()
+        data += _encode_address(address_arg)
     return decode_int(eth_call(rpc_url, contract, data))
 
 
 def read_bool(rpc_url, contract, sig, bytes32_arg):
-    data = selector(sig) + abi_encode(["bytes32"], [bytes32_arg]).hex()
+    data = selector(sig) + _encode_bytes32(bytes32_arg)
     return decode_bool(eth_call(rpc_url, contract, data))
 
 
@@ -426,17 +441,11 @@ def verify_struct_hash(rpc_url, user, payload, metadata) -> str:
 
 
 def fetch_mint_status(rpc_url, csos_addr, user):
+    """Returns (effective, minted, mintable). Raises on RPC/decode errors."""
     eff = read_int(rpc_url, LEDGER_ADDR, "effectiveOf(address)", user)
     minted = read_uint(rpc_url, csos_addr, "minted(address)", user)
     mintable = read_uint(rpc_url, csos_addr, "mintable(address)", user)
-    cap = max(0, eff - C_SOS_RESERVE)
-    return {
-        "effectiveOf": eff,
-        "reserve": C_SOS_RESERVE,
-        "cap": cap,
-        "minted": minted,
-        "mintable": mintable,
-    }
+    return int(eff), int(minted), int(mintable)
 
 
 # =====================================================================
@@ -596,10 +605,10 @@ class DeployTab(BoxLayout):
         self.add_widget(make_header("SOS Deployer — Deploy"))
 
         self.pk       = make_input("Private key (0x...)", password=True)
-        self.rpc_url  = make_input("RPC URL (e.g. https://sepolia.infura.io/v3/KEY)",
-                                  text="https://ethereum-sepolia-rpc.publicnode.com")
-        self.chain_id = make_input("Chain ID (1=mainnet, 11155111=Sepolia)", numeric=True,
-                                   text="11155111")
+        self.rpc_url  = make_input("RPC URL (mainnet)",
+                                  text="https://ethereum-rpc.publicnode.com")
+        self.chain_id = make_input("Chain ID (1=mainnet)", numeric=True,
+                                   text="1")
         self.mint_fee = make_input("MINT_FEE in wei (recommend 0)", numeric=True, text="0")
         self.treasury = make_input("TREASURY address (0x...)",
                                    text="0x1C10e6574ee696f54b21A611a21313E4714628ad")
@@ -747,8 +756,8 @@ class MintTab(BoxLayout):
 
         # Connection fields (can be prefilled from Deploy)
         self.rpc_url  = make_input("RPC URL",
-                                  text="https://ethereum-sepolia-rpc.publicnode.com")
-        self.chain_id = make_input("Chain ID", numeric=True, text="11155111")
+                                  text="https://ethereum-rpc.publicnode.com")
+        self.chain_id = make_input("Chain ID", numeric=True, text="1")
         self.pk       = make_input("Private key (signer = minter)", password=True)
         self.contract = make_input("cSOS contract address (0x...)",
                                    text="0xce9B507C242Adf722DD1DE2d7aa5Db1BF2259D8F")
@@ -957,7 +966,7 @@ class QueryTab(BoxLayout):
         self.add_widget(make_header("SOS — Query"))
 
         self.rpc_url  = make_input("RPC URL",
-                                  text="https://ethereum-sepolia-rpc.publicnode.com")
+                                  text="https://ethereum-rpc.publicnode.com")
         self.address  = make_input("Address to query (0x...)")
         self.csos     = make_input("cSOS contract (optional)",
                                    text="0xce9B507C242Adf722DD1DE2d7aa5Db1BF2259D8F")
